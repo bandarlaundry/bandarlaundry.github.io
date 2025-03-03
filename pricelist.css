@@ -1,4 +1,10 @@
-   #searchInput {
+ .container {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+#searchInput {
       width: 100%;
       padding: 10px;
       font-size: 16px;
