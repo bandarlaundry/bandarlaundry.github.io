@@ -1,12 +1,4 @@
-* {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-   
-
-    .container {
+  .container {
       margin: 0 auto;
       text-align: center;
     }
@@ -26,6 +18,7 @@
       background-color: #007bff;
       color: white;
       cursor: pointer;
+      position: center;
     }
 
     #searchButton:hover {
@@ -44,8 +37,6 @@
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-
-    @media (max-width: 600px) {
 
       #searchInput {
         font-size: 14px;
