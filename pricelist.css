@@ -4,12 +4,7 @@
       box-sizing: border-box;
     }
 
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      color: #333;
-      padding: 20px;
-    }
+   
 
     .container {
       max-width: 600px;
@@ -23,12 +18,10 @@
     }
 
     #searchInput {
-      width: 70%;
+      width: 100%;
       padding: 10px;
       font-size: 16px;
       margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
     }
 
     #searchButton {
@@ -37,7 +30,6 @@
       border: none;
       background-color: #007bff;
       color: white;
-      border-radius: 5px;
       cursor: pointer;
     }
 
@@ -59,9 +51,6 @@
     }
 
     @media (max-width: 600px) {
-      h1 {
-        font-size: 20px;
-      }
 
       #searchInput {
         font-size: 14px;
