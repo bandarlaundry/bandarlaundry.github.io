@@ -3,9 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kreolin Karbol Hitam</title>
+    <link href="https://raw.githubusercontent.com/bandardeterjen/index.html/refs/heads/images/favicon.ico" rel="icon">
+    <link href="https://raw.githubusercontent.com/bandardeterjen/index.html/refs/heads/images/apple-touch-icon.png" rel="apple-touch-icon">
+     <!-- SEO Meta Tag -->
+    <meta content='kreolin, karbol hitam, disinfektan, parfum laundry, pewangi laundry, karbol, pel lantai, pewangi setrika, softener, pelembut pakaian, deterjen bubuk, karbol sereh, pel lantai, anti noda, bahan kimia' name='keywords'/>
+    <meta content='Pilih Kreolin Karbol Hitam untuk solusi pembersihan yang tidak hanya efektif, tetapi juga menghadirkan kebersihan dengan aroma yang menyegarkan! Pastikan rumah dan kandang hewan Anda tetap bersih dan bebas kuman dengan Kreolin Karbol Hitam, pilihan tepat untuk kebersihan yang lebih baik.n'/>
+    <meta content='index,follow' name='robots'/>
+    <meta content='text/html;charset=UTF-8' http-equiv='Content-Type'/>
+    <meta content='general' name='rating'/>
+    <!-- SEO Title Tag -->
+    <meta content='text/html;charset=UTF-8' http-equiv='Content-Type'/>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'/>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+    <title>085773009666 Kreolin Karbol Hitam Pembersih Lantai Kandang</title>
     <link rel="stylesheet" href="../lp.css">
-    <link href="../button.css" rel="stylesheet"> 
+    <link href="../button-mp.css" rel="stylesheet"> 
     <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -15,15 +27,8 @@
         <section id="markdown-content">
         </section>
      </div>
-
-
-<div class="frame">
-  <button class="custom-btn btn-11"><a href="https://tokopedia.com">Tokopedia</a><div class="dot"></div></button>
-  <button class="custom-btn btn-12"><span><a href="https://tokopedia.com">Shopee</a></span><span>Shopee</span></button>
-  <p style="font-family: Andale Mono, monospace;">
-    Selamat Berbelanja</p>
-</div>
-        
+        <!-- Footer Container -->
+    <div id="link-container"></div>
     <script>
         // Load and render Markdown content
         fetch('kreolin.md')
@@ -33,6 +38,13 @@
                     marked.parse(text);
             })
             .catch(error => console.error('Error loading content:', error));
+        // Load link mp
+        fetch('link-mp.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('link-container').innerHTML = html;
+            })
+            .catch(error => console.error('Error loading footer:', error));
       </script>
      <script src="../waform.js"></script>
 </body>
