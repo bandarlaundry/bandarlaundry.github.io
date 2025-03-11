@@ -19,6 +19,29 @@ h1, h2, h3, h4 {
     text-align: center;
 }
 
+h4 {
+ font-family: "Times New Roman", Times, serif;
+ font-weight: 300;
+ font-size: 26px;
+ line-height: 1.4em;
+ color: #404040;
+}
+
+h5 {
+ font-family: "Times New Roman", Times, serif;
+ font-weight: 300;
+ font-size: 22px;
+ line-height: 1.4em;
+ color: #404040;
+}
+
+h6 {
+ font-family: "Times New Roman", Times, serif;
+ font-weight: 300;
+ font-size: 19px;
+ line-height: 1.4em;
+ color: #404040;
+}
 
 img {
     max-width: 100%;
