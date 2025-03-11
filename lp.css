@@ -14,33 +14,35 @@ section {
     margin: 40px 0;
 }
 
-h1, h2, h3, h4 {
+p {
+    color: #2c3e50;
+
+ h1, h2, h3 {
     color: #2c3e50;
     text-align: center;
 }
 
 h4 {
- font-family: "Times New Roman", Times, serif;
+ color: #2c3e50;
+ text-align: center;
  font-weight: 300;
  font-size: 26px;
- line-height: 1.4em;
- color: #404040;
 }
 
 h5 {
+ color: #2c3e50;
+ text-align: center;
  font-family: "Times New Roman", Times, serif;
  font-weight: 300;
  font-size: 22px;
- line-height: 1.4em;
- color: #404040;
 }
 
 h6 {
+ color: #2c3e50;
+ text-align: center;
  font-family: "Times New Roman", Times, serif;
  font-weight: 300;
  font-size: 19px;
- line-height: 1.4em;
- color: #404040;
 }
 
 img {
