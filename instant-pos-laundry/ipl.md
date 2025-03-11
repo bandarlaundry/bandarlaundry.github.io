@@ -2,6 +2,8 @@
 
 #### Mencari aplikasi kasir yang mudah digunakan dan praktis untuk bisnis laundry Anda? Instant POS Laundry adalah pilihan tepat untuk Anda! Dengan fitur-fitur canggih dan kemudahan penggunaan, aplikasi ini membantu memperlancar operasional bisnis laundry Anda.
 
+![Instant POS Laundry Aplikasi Kasir Tanpa Ribet](https://raw.githubusercontent.com/bandarlaundry/blog/refs/heads/images/bl-instant-pos-laundry.webp)
+
 Fitur Unggulan Instant POS Laundry:
 - **Biaya Murah** : Harga yang terjangkau dan Anda bisa pakai selamanya!
 - **Ada Nama Usaha Anda** : Sesuaikan aplikasi dengan nama usaha Anda, memberi kesan lebih profesional.
