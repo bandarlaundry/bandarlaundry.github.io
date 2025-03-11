@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kreolin Karbol Hitam</title>
     <link rel="stylesheet" href="../lp.css">
-    <!-- Add Marked.js for Markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
@@ -43,14 +42,6 @@
             })
             .catch(error => console.error('Error loading content:', error));
 
-        // WhatsApp Form Handling
-        document.getElementById('whatsappForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const message = `Name: ${formData.get('name')}\nEmail: ${formData.get('email')}\nPhone: ${formData.get('phone')}\nAddress: ${formData.get('address')}\nMessage: ${formData.get('message')}`;
-            const whatsappUrl = `https://wa.me/6285773009666?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-        });
     </script>
 </body>
 </html>
