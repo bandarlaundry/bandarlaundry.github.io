@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bandar Laundry</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
     <link href="/logo.png" rel="icon">
     <link href="/logo.png" rel="apple-touch-icon">
  <!-- SEO Meta Tag -->
