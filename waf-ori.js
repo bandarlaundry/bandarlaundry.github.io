@@ -1,3 +1,4 @@
+// WhatsApp number 085773009666 form id whatsappForm
 document.getElementById('whatsappForm').addEventListener('submit', function (e) {
   e.preventDefault();
 
