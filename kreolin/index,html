@@ -20,12 +20,10 @@
 </head>
 <body>
     <div class="container">
-        <!-- Profile Section -->
-        <div class="profile">
-            <img src="/logo.png" alt="Bandar Laundry" class="profile-pic">
-            <h1 class="name">Bandar Laundry</h1>
-            <p class="description">Menyediakan peralatan dan perlengkapan laundry terutama sabun, parfum laundry, softener, karbol, shampoo, deterjen bubuk, pel lantai, anti noda, bahan kimia, dll.</p>
-        </div>
+       <!-- Markdown Content Section -->
+        <section id="markdown-content">
+        </section>
+   
 
         <!-- Links Section Media -->
         <div class="links">
@@ -44,5 +42,16 @@
             <a href="https://www.youtube.com/in/bandarlaundry" class="social-icon"><img src="https://raw.githubusercontent.com/bandardeterjen/index.html/refs/heads/images/bd-socmed-yt-removebg-preview.png" alt="Bandar Deterjen"></a>
         </div>
     </div>
+ <script>
+        // Load and render Markdown content
+        fetch('kreolin.md')
+            .then(response => response.text())
+            .then(text => {
+                document.getElementById('markdown-content').innerHTML = 
+                    marked.parse(text);
+            })
+            .catch(error => console.error('Error loading content:', error));
+      </script>
+     <script src="../waform.js"></script>
 </body>
 </html>
