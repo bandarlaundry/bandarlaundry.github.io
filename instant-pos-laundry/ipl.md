@@ -13,4 +13,4 @@ Fitur Unggulan Instant POS Laundry:
 #### Dengan Instant POS Laundry, Anda bisa menjalankan transaksi dengan lebih efisien dan cepat tanpa khawatir soal keamanan data. 
 
 #### Harga Promo! Hanya Rp 99.000 sekali bayar dan Anda bisa menggunakan aplikasi ini selamanya. Ingin mencoba dulu? Coba gratis sekarang juga!
-Jadikan operasional laundry Anda lebih mudah dan cepat dengan Instant POS Laundry
+##### Jadikan operasional laundry Anda lebih mudah dan cepat dengan Instant POS Laundry
