@@ -1,12 +1,33 @@
  <div class="container">
-   <p style="font-family: Andale Mono, monospace;">
-    Ingin mencoba dulu? Coba gratis sekarang juga!</p>
-        <form id="whatsappForm" class="contact-form">
-            <input type="text" name="name" placeholder="Your Name" required>
-            <input type="email" name="email" placeholder="Email" required>
-            <input type="tel" name="phone" placeholder="Phone" required>
-            <input type="text" name="address" placeholder="Address" required>
-            <textarea name="message" placeholder="Message"></textarea>
-            <button type="submit">Send via WhatsApp</button>
-        </form>
+        <form id="whatsappForm">
+      <label for="name">Nama:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="phone">Telepon:</label>
+      <input type="tel" id="phone" name="phone" required>
+
+      <label for="address">Alamat:</label>
+      <textarea id="address" name="address" rows="3" required></textarea>
+
+      <label for="product">Pilih Produk:</label>
+      <select id="product" name="product" required>
+        <option value="Beli parfum laundry">Beli parfum laundry</option>
+        <option value="Beli deterjen laundry">Beli deterjen laundry</option>
+        <option value="Beli softener laundry">Beli softener laundry</option>
+        <option value="Beli karbol wangi">Beli karbol wangi</option>
+        <option value="Beli ebook Laundry Naik Kelas">Beli ebook Laundry Naik Kelas</option>
+        <option value="Beli ebook Bisnis Laundry Kiloan Online">Beli ebook Bisnis Laundry Kiloan Online</option>
+        <option value="Beli ebook Laundry Pesantren">Beli ebook Laundry Pesantren</option>
+        <option value="Ikut kelas sabuny">Ikut kelas sabun</option>
+        <option value="Ikut kursus laundry">Ikut kursus laundry</option>
+        <option value="Jasa laundry">Jasa laundry</option>
+        <option value="Jasa bikin website laundry">Jasa bikin website laundry</option>
+        <option value="Keperluan lain">Keperluan lain</option>
+      </select>
+
+      <button type="submit">Kirim Ke WhatsApp</button>
+    </form>
         </div>
