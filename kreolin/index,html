@@ -22,9 +22,10 @@
 <body>
     <div class="container">
        <!-- Markdown Content Section -->
-        <section id="markdown-content">
+        <section class="features" id="markdown-content">
         </section>
-   
+    </div>
+     <div class="container">
 
         <!-- Links Section Media -->
         <div class="links">
