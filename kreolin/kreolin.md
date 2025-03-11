@@ -16,6 +16,6 @@ Dengan hanya menambahkan sekitar 30 ml Kreolin Karbol Hitam ke dalam ember beris
 
 - **Disinfektan Kuat**: Membantu menghilangkan kuman dan bakteri, menciptakan lingkungan yang lebih sehat bagi keluarga dan hewan peliharaan Anda.
 
-#### **Mudah Digunakan**: Cukup tuang ke air dan gunakan untuk berbagai keperluan pembersihan sehari-hari. Efektif dan praktis!
+- **Mudah Digunakan**: Cukup tuang ke air dan gunakan untuk berbagai keperluan pembersihan sehari-hari. Efektif dan praktis!
 
 Pilih Kreolin Karbol Hitam untuk solusi pembersihan yang tidak hanya efektif, tetapi juga menghadirkan kebersihan dengan aroma yang menyegarkan! Pastikan rumah dan kandang hewan Anda tetap bersih dan bebas kuman dengan Kreolin Karbol Hitam, pilihan tepat untuk kebersihan yang lebih baik.
