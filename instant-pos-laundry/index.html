@@ -30,7 +30,62 @@
         </section>
      </div>
         <!-- Footer Container -->
-    <div id="link-container"></div>
+     <div class="container">
+        <form id="whatsappForm">
+      <label for="name">Nama:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="phone">Telepon:</label>
+      <input type="tel" id="phone" name="phone" required>
+
+      <label for="address">Alamat:</label>
+      <textarea id="address" name="address" rows="3" required></textarea>
+
+      <label for="product">Pilih Produk:</label>
+      <select id="product" name="product" required>
+        <option value="Beli Instant POS Laundry Sekali Bayar">Sekali Bayar</option>
+        <option value="Beli Instant POS Laundry Bayar Tahunan">Bayar Tahunan</option>
+        <option value="Beli Instant POS Laundry Coba Demo Gratis">Coba Demo Gratis</option>
+        <option value="Beli ebook Laundry Naik Kelas">Beli ebook Laundry Naik Kelas</option>
+        <option value="Beli ebook Bisnis Laundry Kiloan Online">Beli ebook Bisnis Laundry Kiloan Online</option>
+        <option value="Beli ebook Laundry Pesantren">Beli ebook Laundry Pesantren</option>
+        <option value="Ikut kelas sabuny">Ikut kelas sabun</option>
+        <option value="Ikut kursus laundry">Ikut kursus laundry</option>
+        <option value="Jasa laundry">Jasa laundry</option>
+        <option value="Jasa bikin website laundry">Jasa bikin website laundry</option>
+        <option value="Keperluan lain">Keperluan lain</option>
+      </select>
+
+      <button type="submit">Kirim Ke WhatsApp</button>
+    </form>
+    <script>
+function handleSubmit(event) {
+  event.preventDefault();
+  
+  const form = document.getElementById('contactForm');
+  const formData = new FormData(form);
+  
+  const message = `
+    *New Contact Form Submission*
+    
+    Name: ${formData.get('name')}
+    Email: ${formData.get('email')}
+    Phone: ${formData.get('phone')}
+    Address: ${formData.get('address')}
+    Product: ${formData.get('product')}
+  `;
+  
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappUrl = `https://wa.me/6285773009666?text=${encodedMessage}`;
+  
+  window.open(whatsappUrl, '_blank');
+}
+</script>
+        </div>
+
     <script>
         // Load and render Markdown content
         fetch('ipl.md')
@@ -40,13 +95,6 @@
                     marked.parse(text);
             })
             .catch(error => console.error('Error loading content:', error));
-        // Load link WA
-        fetch('link-wa.html')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('link-container').innerHTML = html;
-            })
-            .catch(error => console.error('Error loading footer:', error));
       </script>
 </body>
 </html>
