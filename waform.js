@@ -1,4 +1,3 @@
-// script.js
 document.getElementById('whatsappForm').addEventListener('submit', function (e) {
   e.preventDefault();
 
@@ -17,18 +16,18 @@ document.getElementById('whatsappForm').addEventListener('submit', function (e) 
 
   // Construct the message
   const message = `
-    *New Order Details:*
-    Name: ${name}
+    *Ada Orderan Baru Nih:*
+    Nama: ${name}
     Email: ${email}
-    Phone: ${phone}
-    Address: ${address}
-    Product: ${product}
+    Telepon: ${phone}
+    Alamat: ${address}
+    Produk: ${product}
 
-    *Browser Info:* ${userAgent}
-    *Date:* ${date}
-    *Time:* ${time}
+    *Browsero:* ${userAgent}
+    *Tanggal:* ${date}
+    *Jam:* ${time}
 
-    Terimakasih sudah berbelanja pada kami
+    > _Terimakasih sudah berbelanja pada kami_
   `;
 
   // Encode the message for URL
