@@ -34,8 +34,7 @@ img {
     text-align: center;
 }
 
-/* Left-align lists in content */
-.features ul,
+
 .features ol {
     text-align: left;
     margin: 20px auto;
@@ -102,6 +101,50 @@ img {
         flex-direction: column;
         align-items: center;
     }
+.links .link {
+    display: block;
+    background-color: #4169E1;
+    color: white;
+    text-decoration: none;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.links .link:hover {
+    background-color: #0056b3;
+}
+
+.links2 .link {
+    display: block;
+    background-color: #FFA500;
+    color: black;
+    text-decoration: none;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.links2 .link:hover {
+    background-color: #FF5349;
+}
+
+.links3 .link {
+    display: block;
+    background-color: #333;
+    color: white;
+    text-decoration: none;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.links3 .link:hover {
+    background-color: #FFF000;
+}
     
     .payment-btn {
         width: 100%;
