@@ -146,8 +146,23 @@ img {
     background-color: #FFF000;
 }
     
-    .payment-btn {
-        width: 100%;
-        flex: 1 1 auto;
+ /* Responsive Design */
+@media (max-width: 1200px) {
+    .profile-pic {
+        width: 80px;
+        height: 80px;
+    }
+
+    .name {
+        font-size: 20px;
+    }
+
+    .description {
+        font-size: 12px;
+    }
+
+    .links .link {
+        padding: 12px;
+        font-size: 14px;
     }
 }
