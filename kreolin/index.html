@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kreolin Karbol Hitam</title>
+    <link rel="stylesheet" href="landingpage.css">
+    <!-- Add Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section 
+        <section class="hero">
+            <h1>Welcome to Our Service</h1>
+            <p>Your tagline goes here</p>
+        </section>
+        -->
+        
+        <!-- Markdown Content Section -->
+        <section class="features" id="markdown-content">
+        </section>
+
+        <!-- 
+        <form id="whatsappForm" class="contact-form">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="tel" name="phone" placeholder="Phone" required>
+            <input type="text" name="address" placeholder="Address" required>
+            <textarea name="message" placeholder="Message"></textarea>
+            <button type="submit">Send via WhatsApp</button>
+        </form>
+         -->
+    </div>
+
+    <script>
+        // Load and render Markdown content
+        fetch('content.md')
+            .then(response => response.text())
+            .then(text => {
+                document.getElementById('markdown-content').innerHTML = 
+                    marked.parse(text);
+            })
+            .catch(error => console.error('Error loading content:', error));
+
+        // WhatsApp Form Handling
+        document.getElementById('whatsappForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const message = `Name: ${formData.get('name')}\nEmail: ${formData.get('email')}\nPhone: ${formData.get('phone')}\nAddress: ${formData.get('address')}\nMessage: ${formData.get('message')}`;
+            const whatsappUrl = `https://wa.me/6285773009666?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        });
+    </script>
+</body>
+</html>
