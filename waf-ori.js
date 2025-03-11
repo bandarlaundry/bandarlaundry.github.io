@@ -23,11 +23,11 @@ document.getElementById('whatsappForm').addEventListener('submit', function (e) 
     Alamat: ${address}
     Produk: ${product}
 
-    *Browsero:* ${userAgent}
+    *Dari:* ${userAgent}
     *Tanggal:* ${date}
     *Jam:* ${time}
 
-    > _Terimakasih sudah berbelanja pada kami_
+    _Terimakasih sudah berbelanja pada kami_
   `;
 
   // Encode the message for URL
