@@ -61,29 +61,6 @@
 
       <button type="submit">Kirim Ke WhatsApp</button>
     </form>
-    <script>
-function handleSubmit(event) {
-  event.preventDefault();
-  
-  const form = document.getElementById('contactForm');
-  const formData = new FormData(form);
-  
-  const message = `
-    *New Contact Form Submission*
-    
-    Name: ${formData.get('name')}
-    Email: ${formData.get('email')}
-    Phone: ${formData.get('phone')}
-    Address: ${formData.get('address')}
-    Product: ${formData.get('product')}
-  `;
-  
-  const encodedMessage = encodeURIComponent(message);
-  const whatsappUrl = `https://wa.me/6285773009666?text=${encodedMessage}`;
-  
-  window.open(whatsappUrl, '_blank');
-}
-</script>
         </div>
 
     <script>
