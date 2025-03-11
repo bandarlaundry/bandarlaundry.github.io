@@ -29,12 +29,6 @@ img {
     border-radius: 8px;
 }
 
-.container-footer {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-}
 /* Add these new styles */
 .payment-methods {
     text-align: center;
