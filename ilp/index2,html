@@ -321,19 +321,26 @@
 
     function exportToTxt() {
       const summaryText = `
-        Customer Name: ${document.getElementById('summary-name').innerText}
-        Address: ${document.getElementById('summary-address').innerText}
-        Phone: ${document.getElementById('summary-phone').innerText}
-        Products:
+BANDAR LAUNDRY
+PerumGAS Blok Y No 1
+Cileungsi Bogor
+www.bandarlaundry.com 
+Whatsapp: 085773009666
+=========================\n
+        Nama: ${document.getElementById('summary-name').innerText}
+        Alamat: ${document.getElementById('summary-address').innerText}
+        Telepon: ${document.getElementById('summary-phone').innerText}
+        Produk:
         ${Array.from(document.getElementById('summary-products').children)
           .map(li => li.innerText)
           .join('\n')}
-        Date: ${document.getElementById('summary-date').innerText}
+        Tanggal: ${document.getElementById('summary-date').innerText}
         Invoice: ${document.getElementById('summary-invoice').innerText}
-        Total Price: Rp ${document.getElementById('summary-total').innerText}
+        Total Harga: Rp ${document.getElementById('summary-total').innerText}
         Discount: ${document.getElementById('summary-discount').innerText}%
         Down Payment: Rp ${document.getElementById('summary-down-payment').innerText}
-        Final Amount: Rp ${document.getElementById('summary-final').innerText}
+        Jumlah Akhir: Rp ${document.getElementById('summary-final').innerText}\n
+Terimakasih sudah menggunakan jasa laundry kami.
       `;
 
       const blob = new Blob([summaryText], { type: 'text/plain' });
@@ -347,19 +354,26 @@
     function sendToWhatsApp() {
       const phone = formatPhoneNumber(document.getElementById('phone').value);
       const summaryText = `
-        Customer Name: ${document.getElementById('summary-name').innerText}
-        Address: ${document.getElementById('summary-address').innerText}
-        Phone: ${document.getElementById('summary-phone').innerText}
-        Products:
+*BANDAR LAUNDRY*
+PerumGAS Blok Y No 1
+Cileungsi Bogor
+www.bandarlaundry.com\n
+Whatsapp: 085773009666   
+========================\n
+        Nama: ${document.getElementById('summary-name').innerText}
+        Alamat: ${document.getElementById('summary-address').innerText}
+        Telepon: ${document.getElementById('summary-phone').innerText}
+        Produk:
         ${Array.from(document.getElementById('summary-products').children)
           .map(li => li.innerText)
           .join('\n')}
-        Date: ${document.getElementById('summary-date').innerText}
+        Tanggal: ${document.getElementById('summary-date').innerText}
         Invoice: ${document.getElementById('summary-invoice').innerText}
-        Total Price: Rp ${document.getElementById('summary-total').innerText}
+        Total Harga: Rp ${document.getElementById('summary-total').innerText}
         Discount: ${document.getElementById('summary-discount').innerText}%
         Down Payment: Rp ${document.getElementById('summary-down-payment').innerText}
-        Final Amount: Rp ${document.getElementById('summary-final').innerText}
+        Jumlah Akhir: Rp ${document.getElementById('summary-final').innerText}\n
+_Terimakasih sudah menggunakan jasa laundry kami_.
       `;
 
       const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(summaryText)}`;
