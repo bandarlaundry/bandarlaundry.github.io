@@ -79,25 +79,25 @@
   <div class="container">
     <!-- Customer Data Section -->
     <div class="customer-data">
-      <h3>Customer Information</h3>
-      <label for="name">Name:</label>
-      <input type="text" id="name" placeholder="Enter customer name" required>
+      <h3>Informasi Pelanggan</h3>
+      <label for="name">Nama:</label>
+      <input type="text" id="name" placeholder="Tuliskan nama pelanggan" required>
 
-      <label for="address">Address:</label>
-      <textarea id="address" placeholder="Enter customer address" rows="3"></textarea>
+      <label for="address">Alamat:</label>
+      <textarea id="address" placeholder="Tuliskan alamat pelanggan" rows="3"></textarea>
 
-      <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" placeholder="Enter phone number (e.g., 085773009666)" required>
+      <label for="phone">Nomor Whatsapp:</label>
+      <input type="tel" id="phone" placeholder="Tuliska nomor WA dengan benar (e.g., 085773009666)" required>
     </div>
 
     <!-- Product Selection Section -->
     <div class="product-selection">
-      <h3>Add Products</h3>
+      <h3>Tambah Produk</h3>
       <div id="product-list">
         <!-- Product rows will be dynamically added here -->
       </div>
-      <button onclick="addProductRow()">Add Predefined Product</button>
-      <button onclick="addCustomProductRow()">Add Custom Product</button>
+      <button onclick="addProductRow()">Tambah Produk Tersedia</button>
+      <button onclick="addCustomProductRow()">Tambah Produk Tak Tersedia</button>
     </div>
 
     <!-- Discount and Down Payment Section -->
@@ -112,24 +112,24 @@
 
     <!-- Summary Section -->
     <div class="summary hidden">
-      <h3>Transaction Summary</h3>
-      <p><strong>Customer Name:</strong> <span id="summary-name"></span></p>
-      <p><strong>Address:</strong> <span id="summary-address"></span></p>
-      <p><strong>Phone:</strong> <span id="summary-phone"></span></p>
-      <p><strong>Products:</strong></p>
+      <h3>Rangkuman Transaksi</h3>
+      <p><strong>Nama Pelanggan:</strong> <span id="summary-name"></span></p>
+      <p><strong>Alamat:</strong> <span id="summary-address"></span></p>
+      <p><strong>Whatsapp:</strong> <span id="summary-phone"></span></p>
+      <p><strong>Produk:</strong></p>
       <ul id="summary-products"></ul>
-      <p><strong>Date:</strong> <span id="summary-date"></span></p>
+      <p><strong>Tanggal:</strong> <span id="summary-date"></span></p>
       <p><strong>Invoice:</strong> <span id="summary-invoice"></span></p>
-      <p><strong>Total Price:</strong> Rp <span id="summary-total"></span></p>
+      <p><strong>Total Harga:</strong> Rp <span id="summary-total"></span></p>
       <p><strong>Discount:</strong> <span id="summary-discount"></span>%</p>
       <p><strong>Down Payment:</strong> Rp <span id="summary-down-payment"></span></p>
-      <p><strong>Final Amount:</strong> Rp <span id="summary-final"></span></p>
+      <p><strong>Jumlah Akhir:</strong> Rp <span id="summary-final"></span></p>
     </div>
 
     <!-- Action Buttons -->
-    <button onclick="calculateSummary()">Calculate Summary</button>
-    <button onclick="exportToTxt()" class="hidden" id="export-btn">Export to TXT</button>
-    <button onclick="sendToWhatsApp()" class="hidden" id="whatsapp-btn">Send to WhatsApp</button>
+    <button onclick="calculateSummary()">Hitung</button>
+    <button onclick="exportToTxt()" class="hidden" id="export-btn">Cetak Via TXT</button>
+    <button onclick="sendToWhatsApp()" class="hidden" id="whatsapp-btn">Kirim Ke WhatsApp</button>
   </div>
 
   <script>
