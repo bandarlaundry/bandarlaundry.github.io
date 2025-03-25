@@ -174,9 +174,9 @@
         subcategoriesDiv.innerHTML = `
           <label for="subcategory-${index}">Subcategory:</label>
           <select id="subcategory-${index}">
-            <option value="reguler">Laundry Reguler (Rp 7,000/kg)</option>
-            <option value="ekspres">Laundry Ekspres (Rp 10,000/kg)</option>
-            <option value="kilat">Laundry Kilat (Rp 12,000/kg)</option>
+            <option value="reguler">Laundry Reguler (Rp 9,000/kg)</option>
+            <option value="ekspres">Laundry Ekspres (Rp 12,000/kg)</option>
+            <option value="kilat">Laundry Kilat (Rp 15,000/kg)</option>
           </select>
         `;
       } else if (category === 'satuan') {
@@ -248,9 +248,9 @@
         let price = 0;
         if (category === 'kiloan') {
           switch (subcategory) {
-            case 'reguler': price = 7000; break;
-            case 'ekspres': price = 10000; break;
-            case 'kilat': price = 12000; break;
+            case 'reguler': price = 9000; break;
+            case 'ekspres': price = 12000; break;
+            case 'kilat': price = 15000; break;
           }
         } else if (category === 'satuan') {
           switch (subcategory) {
