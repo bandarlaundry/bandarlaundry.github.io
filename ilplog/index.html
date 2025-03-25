@@ -8,6 +8,24 @@
   <link rel="stylesheet" href="log.css">
 </head>
 <body>
+   <div class="login-container">
+    <!-- Login Form -->
+    <form id="loginForm" class="login-form">
+      <h2>Login</h2>
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+      </div>
+      <button type="submit" class="btn">Login</button>
+      <p id="error-message" class="error-message"></p>
+    </form>
+
+ <div id="content" class="content" style="display: none;">
+   
   <div class="container">
     <!-- Customer Data Section -->
     <div class="customer-data">
@@ -63,6 +81,11 @@
     <button onclick="exportToTxt()" class="hidden" id="export-btn">Cetak Via TXT</button>
     <button onclick="sendToWhatsApp()" class="hidden" id="whatsapp-btn">Kirim Ke WhatsApp</button>
   </div>
+
+   <button id="logoutBtn" class="btn"><span id="expiryDate"></span> Logout</button>
+        <div id="footer"></div>
+     </div>
+     
   <script src="log.js"></script>
   <script src="ilp.js"></script>
 </body>
