@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <title>Instant Laundry POS</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="https://raw.githubusercontent.com/bandarlaundry/blog/refs/heads/images/bandarlaundry-logo-tr.png" alt="Logo">
+      <h1>Instant Laundry POS</h1>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="../">Beranda</a></li>
+        <li><a href="about.html">Tentang</a></li>
+        <li><a href="contact.html">Kontak</a></li>
+      </ul>
+      <div class="hamburger">&#9776;</div>
+    </nav>
+  </header>
+
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Cari produk...">
+  </div>
+
+  <div class="product-grid" id="product-grid"></div>
+
+  <div class="pagination" id="pagination">
+    <button id="prev-page" onclick="changePage(-1)" disabled><</button>
+    <div id="page-numbers"></div>
+    <button id="next-page" onclick="changePage(1)">></button>
+  </div>
+
+  <div class="summary">
+    <h2>Rangkuman Transaksi</h2>
+    <form id="transaction-form">
+      <!-- Customer Data -->
+      <input type="text" id="name" placeholder="Nama *" required>
+      <input type="text" id="address" placeholder="Alamat *" required>
+      <input type="text" id="whatsapp" placeholder="Nomor WhatsApp *" required>
+
+      <!-- Selected Products -->
+      <div id="selected-products"></div>
+
+      <!-- Total Amount -->
+      <p id="total-amount">Total: Rp 0</p>
+
+      <!-- Discount and Down Payment -->
+      <input type="number" id="discount" placeholder="Diskon (%)">
+      <input type="number" id="down-payment" placeholder="Uang Muka (Rp)">
+      <button type="button" class="update-button" onclick="updateTotal()">Update Total</button>
+
+      <!-- Add Custom Product Button -->
+      <button type="button" onclick="toggleCustomProduct()">Tambah Produk Khusus</button>
+
+      <!-- Custom Product Section -->
+      <div class="custom-product-section" id="custom-product-section">
+        <textarea id="custom-product" placeholder="Nama produk khusus (jika ada)"></textarea>
+        <input type="number" id="custom-price" placeholder="Harga produk khusus (Rp)">
+        <input type="number" id="custom-amount" placeholder="Jumlah produk khusus">
+        <button type="button" onclick="addCustomProduct()">Tambahkan Produk Khusus</button>
+      </div>
+
+      <button type="submit">Kirim Transaksi</button>
+    </form>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Instant Laundry POS Versi 2. All rights reserved.</p>
+    <ul>
+      <li><a href="../">Beranda</a></li>
+        <li><a href="about.html">Tentang</a></li>
+        <li><a href="contact.html">Kontak</a></li>
+    </ul>
+    <div class="social-media">
+      <a href="https://facebook.com/bandarlaundry" target="_blank"><i class="fa fa-facebook-f"></i></a> <!-- Facebook Icon -->
+      <a href="https://instagram.com/bandarlaundry" target="_blank"><i class="fa fa-instagram"></i></a> <!-- Instagram Icon -->
+      <a href="https://youtube.com/bandarlaundry" target="_blank"><i class="fa fa-youtube"></i></a> <!-- YouTube Icon -->
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
