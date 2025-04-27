@@ -261,7 +261,6 @@
         item.innerHTML = `
           <img src="${product.image}" alt="${product.name}">
           <h3>${product.name}</h3>
-          <p>${product.description}</p>
           <p>Rp ${product.price.toLocaleString()}</p>
         `;
         item.onclick = () => addProductToSummary(product);
@@ -369,7 +368,7 @@
       const whatsappLink = `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`;
       window.open(whatsappLink, '_blank');
 
-      // Save as TXT
+      // Automatically save as TXT
       const blob = new Blob([message], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
