@@ -382,7 +382,7 @@
           <h3>${product.name}</h3>
           <p>${product.description}</p>
           <p>${product.price === 0 ? 'Gratis' : `Rp ${product.price.toLocaleString()}`}</p>
-          <button onclick="addProductToSummary('${product.name}', 1)">Tambah ke Rangkuman</button>
+          <button onclick="addProductToSummary('${product.name}', 1)">Tambahkan</button>
         `;
         productGrid.appendChild(item);
       });
