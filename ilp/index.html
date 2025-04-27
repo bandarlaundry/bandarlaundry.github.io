@@ -156,25 +156,24 @@
       cursor: pointer;
     }
 
-    /* Quick Amount Buttons */
-    .quick-amount {
-      margin-top: 10px;
-    }
-
-    .quick-amount button {
-      margin: 0 5px;
-      padding: 5px 10px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    /* Hidden Custom Product Section */
+    /* Custom Product Section */
     .custom-product-section {
-      display: none;
       margin-top: 20px;
+      display: none;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .custom-product-section textarea,
+    .custom-product-section input {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    /* Update Button */
+    .update-button {
+      margin-top: 10px;
     }
 
     /* Pagination */
@@ -237,8 +236,9 @@
       <p id="total-amount">Total: Rp 0</p>
 
       <!-- Discount and Down Payment -->
-      <input type="number" id="discount" placeholder="Diskon (Rp)">
+      <input type="number" id="discount" placeholder="Diskon (%)">
       <input type="number" id="down-payment" placeholder="Uang Muka (Rp)">
+      <button type="button" class="update-button" onclick="updateTotal()">Update Total</button>
 
       <!-- Add Custom Product Button -->
       <button type="button" onclick="toggleCustomProduct()">Tambah Produk Khusus</button>
@@ -248,6 +248,7 @@
         <textarea id="custom-product" placeholder="Nama produk khusus (jika ada)"></textarea>
         <input type="number" id="custom-price" placeholder="Harga produk khusus (Rp)">
         <input type="number" id="custom-amount" placeholder="Jumlah produk khusus">
+        <button type="button" onclick="addCustomProduct()">Tambahkan Produk Khusus</button>
       </div>
 
       <button type="submit">Kirim Transaksi</button>
@@ -291,11 +292,7 @@
           <img src="${product.image}" alt="${product.name}">
           <h3>${product.name}</h3>
           <p>Rp ${product.price.toLocaleString()}</p>
-          <div class="quick-amount">
-            <button onclick="addProductToSummary('${product.name}', 1)">+1</button>
-            <button onclick="addProductToSummary('${product.name}', 2)">+2</button>
-            <button onclick="addProductToSummary('${product.name}', 3)">+3</button>
-          </div>
+          <button onclick="addProductToSummary('${product.name}', 1)">Tambah ke Rangkuman</button>
         `;
         productGrid.appendChild(item);
       });
@@ -344,6 +341,26 @@
       customProductSection.style.display = customProductSection.style.display === 'none' ? 'block' : 'none';
     }
 
+    function addCustomProduct() {
+      const name = document.getElementById('custom-product').value;
+      const price = parseFloat(document.getElementById('custom-price').value);
+      const amount = parseInt(document.getElementById('custom-amount').value);
+
+      if (name && price && amount) {
+        if (!selectedProducts[name]) {
+          selectedProducts[name] = { name, price, amount };
+        } else {
+          selectedProducts[name].amount += amount;
+        }
+        updateSummary();
+        document.getElementById('custom-product').value = '';
+        document.getElementById('custom-price').value = '';
+        document.getElementById('custom-amount').value = '';
+      } else {
+        alert('Harap isi semua kolom untuk produk khusus.');
+      }
+    }
+
     function updateSummary() {
       const selectedProductsContainer = document.getElementById('selected-products');
       selectedProductsContainer.innerHTML = '';
@@ -370,17 +387,31 @@
       updateSummary();
     }
 
+    function updateTotal() {
+      const discountPercentage = parseFloat(document.getElementById('discount').value) || 0;
+      const downPayment = parseFloat(document.getElementById('down-payment').value) || 0;
+
+      let totalAmount = 0;
+
+      Object.keys(selectedProducts).forEach(name => {
+        const product = selectedProducts[name];
+        totalAmount += product.price * product.amount;
+      });
+
+      const discountAmount = (totalAmount * discountPercentage) / 100;
+      const finalAmount = totalAmount - discountAmount - downPayment;
+
+      document.getElementById('total-amount').textContent = `Total Akhir: Rp ${finalAmount.toLocaleString()}`;
+    }
+
     document.getElementById('transaction-form').addEventListener('submit', event => {
       event.preventDefault();
 
       const customerName = document.getElementById('name').value;
       const address = document.getElementById('address').value;
       const whatsapp = document.getElementById('whatsapp').value;
-      const customProduct = document.getElementById('custom-product').value;
-      const customPrice = document.getElementById('custom-price').value || 0;
-      const customAmount = document.getElementById('custom-amount').value || 0;
-      const discount = document.getElementById('discount').value || 0;
-      const downPayment = document.getElementById('down-payment').value || 0;
+      const discount = parseFloat(document.getElementById('discount').value) || 0;
+      const downPayment = parseFloat(document.getElementById('down-payment').value) || 0;
 
       const invoice = `INV-${Math.random().toString(36).substr(2, 9)}`;
       const date = new Date().toLocaleDateString();
@@ -404,15 +435,13 @@
         message += `\n- ${product.name} x ${product.amount} = Rp ${(product.price * product.amount).toLocaleString()}`;
       });
 
-      if (customProduct && customPrice && customAmount) {
-        totalAmount += customPrice * customAmount;
-        message += `\n- ${customProduct} x ${customAmount} = Rp ${(customPrice * customAmount).toLocaleString()}`;
-      }
+      const discountAmount = (totalAmount * discount) / 100;
+      const finalAmount = totalAmount - discountAmount - downPayment;
 
       message += `
-        Diskon: Rp ${discount}
-        Uang Muka: Rp ${downPayment}
-        Total Akhir: Rp ${(totalAmount - discount - downPayment).toLocaleString()}
+        Diskon (${discount}%): Rp ${discountAmount.toLocaleString()}
+        Uang Muka: Rp ${downPayment.toLocaleString()}
+        Total Akhir: Rp ${finalAmount.toLocaleString()}
       `;
 
       const whatsappLink = `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`;
