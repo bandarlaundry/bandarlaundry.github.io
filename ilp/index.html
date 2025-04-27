@@ -111,6 +111,7 @@
       text-align: center;
       border-radius: 5px;
       transition: transform 0.2s;
+      cursor: pointer;
     }
 
     .product-item:hover {
@@ -123,27 +124,7 @@
       border-radius: 5px;
     }
 
-    /* Pagination */
-    .pagination {
-      display: flex;
-      justify-content: center;
-      margin: 20px 0;
-    }
-
-    .pagination button {
-      margin: 0 5px;
-      padding: 5px 10px;
-      border: 1px solid #ccc;
-      background: #fff;
-      cursor: pointer;
-    }
-
-    .pagination button.active {
-      background: #007bff;
-      color: #fff;
-    }
-
-    /* Transaction Summary */
+    /* Summary Section */
     .summary {
       margin: 20px;
       padding: 20px;
@@ -174,6 +155,26 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .pagination button {
+      margin: 0 5px;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .pagination button.active {
+      background: #007bff;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -193,22 +194,25 @@
   </header>
 
   <div class="search-bar">
-    <input type="text" placeholder="Cari produk...">
+    <input type="text" id="search-input" placeholder="Cari produk...">
   </div>
 
   <div class="product-grid" id="product-grid"></div>
 
   <div class="pagination" id="pagination"></div>
 
-  <div class="summary" id="summary">
+  <div class="summary">
     <h2>Rangkuman Transaksi</h2>
     <form id="transaction-form">
       <!-- Customer Data -->
       <input type="text" id="name" placeholder="Nama">
       <input type="text" id="address" placeholder="Alamat">
       <input type="text" id="whatsapp" placeholder="Nomor WhatsApp">
-      
-      <!-- Product Details -->
+
+      <!-- Selected Products -->
+      <div id="selected-products"></div>
+
+      <!-- Custom Product Input -->
       <textarea id="custom-product" placeholder="Nama produk khusus (jika ada)"></textarea>
       <input type="number" id="custom-price" placeholder="Harga produk khusus (Rp)">
       <input type="number" id="custom-amount" placeholder="Jumlah produk khusus">
@@ -233,8 +237,8 @@
       .then(data => {
         const rows = data.split('\n').slice(1); // Skip header
         products = rows.map(row => {
-          const [name, price, description] = row.split(',');
-          return { name, price: parseFloat(price), description };
+          const [name, description, price, image] = row.split(',');
+          return { name, description, price: parseFloat(price), image };
         });
         renderProducts();
       })
@@ -246,24 +250,26 @@
       productGrid.innerHTML = '';
       pagination.innerHTML = '';
 
+      const filteredProducts = filterProductsByName();
       const start = (currentPage - 1) * productsPerPage;
       const end = start + productsPerPage;
-      const paginatedProducts = products.slice(start, end);
+      const paginatedProducts = filteredProducts.slice(start, end);
 
       paginatedProducts.forEach(product => {
         const item = document.createElement('div');
         item.className = 'product-item';
         item.innerHTML = `
-          <img src="https://via.placeholder.com/150" alt="${product.name}">
+          <img src="${product.image}" alt="${product.name}">
           <h3>${product.name}</h3>
           <p>${product.description}</p>
           <p>Rp ${product.price.toLocaleString()}</p>
         `;
+        item.onclick = () => addProductToSummary(product);
         productGrid.appendChild(item);
       });
 
       // Pagination
-      const totalPages = Math.ceil(products.length / productsPerPage);
+      const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
       for (let i = 1; i <= totalPages; i++) {
         const button = document.createElement('button');
         button.textContent = i;
@@ -276,7 +282,50 @@
       }
     }
 
-    // Handle transaction form submission
+    function filterProductsByName() {
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+      return products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm) ||
+        product.description.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    document.getElementById('search-input').addEventListener('input', () => {
+      currentPage = 1;
+      renderProducts();
+    });
+
+    const selectedProducts = {};
+
+    function addProductToSummary(product) {
+      if (!selectedProducts[product.name]) {
+        selectedProducts[product.name] = { ...product, amount: 1 };
+      } else {
+        selectedProducts[product.name].amount++;
+      }
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const selectedProductsContainer = document.getElementById('selected-products');
+      selectedProductsContainer.innerHTML = '';
+
+      Object.keys(selectedProducts).forEach(name => {
+        const product = selectedProducts[name];
+        const productDiv = document.createElement('div');
+        productDiv.innerHTML = `
+          <p>${product.name} - Rp ${product.price.toLocaleString()} x ${product.amount}</p>
+          <button onclick="removeProduct('${name}')">Hapus</button>
+        `;
+        selectedProductsContainer.appendChild(productDiv);
+      });
+    }
+
+    function removeProduct(name) {
+      delete selectedProducts[name];
+      updateSummary();
+    }
+
     document.getElementById('transaction-form').addEventListener('submit', event => {
       event.preventDefault();
 
@@ -284,15 +333,15 @@
       const address = document.getElementById('address').value;
       const whatsapp = document.getElementById('whatsapp').value;
       const customProduct = document.getElementById('custom-product').value;
-      const customPrice = document.getElementById('custom-price').value;
-      const customAmount = document.getElementById('custom-amount').value;
+      const customPrice = document.getElementById('custom-price').value || 0;
+      const customAmount = document.getElementById('custom-amount').value || 0;
       const discount = document.getElementById('discount').value || 0;
       const downPayment = document.getElementById('down-payment').value || 0;
 
       const invoice = `INV-${Math.random().toString(36).substr(2, 9)}`;
       const date = new Date().toLocaleDateString();
 
-      const message = `
+      let message = `
         *Rincian Transaksi*
         Nama Pelanggan: ${customerName}
         Alamat: ${address}
@@ -300,10 +349,19 @@
         Tanggal Transaksi: ${date}
         Nomor Invoice: ${invoice}
 
-        Produk Khusus: ${customProduct || '-'}
-        Harga Produk: Rp ${customPrice || '-'}
-        Jumlah Produk: ${customAmount || '-'}
+        Produk Terpilih:
+      `;
 
+      Object.keys(selectedProducts).forEach(name => {
+        const product = selectedProducts[name];
+        message += `\n- ${product.name} x ${product.amount} = Rp ${(product.price * product.amount).toLocaleString()}`;
+      });
+
+      if (customProduct && customPrice && customAmount) {
+        message += `\n- ${customProduct} x ${customAmount} = Rp ${(customPrice * customAmount).toLocaleString()}`;
+      }
+
+      message += `
         Diskon: Rp ${discount}
         Uang Muka: Rp ${downPayment}
       `;
