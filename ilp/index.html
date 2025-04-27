@@ -112,6 +112,7 @@
       border-radius: 5px;
       transition: transform 0.2s;
       cursor: pointer;
+      overflow: hidden;
     }
 
     .product-item:hover {
@@ -120,8 +121,29 @@
 
     .product-item img {
       max-width: 100%;
-      height: auto;
+      height: 100px; /* Uniform image height */
+      object-fit: cover; /* Ensure images fit nicely */
       border-radius: 5px;
+    }
+
+    .product-item h3 {
+      font-size: 16px;
+      margin: 10px 0 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; /* Truncate long titles */
+    }
+
+    .product-item p {
+      font-size: 14px;
+      margin: 5px 0;
+      line-height: 1.2;
+      max-height: 3.6em; /* Limit description to 3 lines */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
     }
 
     /* Pagination */
@@ -268,9 +290,9 @@
     <h2>Rangkuman Transaksi</h2>
     <form id="transaction-form">
       <!-- Customer Data -->
-      <input type="text" id="name" placeholder="Nama">
-      <input type="text" id="address" placeholder="Alamat">
-      <input type="text" id="whatsapp" placeholder="Nomor WhatsApp">
+      <input type="text" id="name" placeholder="Nama *" required>
+      <input type="text" id="address" placeholder="Alamat *" required>
+      <input type="text" id="whatsapp" placeholder="Nomor WhatsApp *" required>
 
       <!-- Selected Products -->
       <div id="selected-products"></div>
@@ -489,11 +511,20 @@
     document.getElementById('transaction-form').addEventListener('submit', event => {
       event.preventDefault();
 
-      const customerName = document.getElementById('name').value;
-      const address = document.getElementById('address').value;
-      const whatsapp = document.getElementById('whatsapp').value;
+      const customerName = document.getElementById('name').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const whatsappInput = document.getElementById('whatsapp').value.trim();
       const discount = parseFloat(document.getElementById('discount').value) || 0;
       const downPayment = parseFloat(document.getElementById('down-payment').value) || 0;
+
+      // Validate required fields
+      if (!customerName || !address || !whatsappInput) {
+        alert('Harap isi semua data pelanggan yang wajib (Nama, Alamat, Nomor WhatsApp).');
+        return;
+      }
+
+      // Format WhatsApp number
+      let whatsapp = whatsappInput.startsWith('0') ? `62${whatsappInput.substring(1)}` : whatsappInput;
 
       const invoice = `INV-${Math.random().toString(36).substr(2, 9)}`;
       const date = new Date().toLocaleDateString();
