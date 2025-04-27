@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instant Laundry POS</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #f4f4f4;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      height: 50px;
+      margin-right: 10px;
+    }
+
+    .logo h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    nav ul li {
+      margin-left: 20px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+
+    /* Mobile Navigation */
+    .hamburger {
+      display: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      nav ul {
+        display: none;
+        flex-direction: column;
+        background: #fff;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 100%;
+        padding: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      nav ul li {
+        margin: 10px 0;
+      }
+
+      .hamburger {
+        display: block;
+      }
+    }
+
+    /* Search Bar */
+    .search-bar {
+      margin: 20px;
+      text-align: center;
+    }
+
+    .search-bar input {
+      padding: 10px;
+      width: 80%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .product-item {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      border-radius: 5px;
+      transition: transform 0.2s;
+    }
+
+    .product-item:hover {
+      transform: scale(1.05);
+    }
+
+    .product-item img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .pagination button {
+      margin: 0 5px;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .pagination button.active {
+      background: #007bff;
+      color: #fff;
+    }
+
+    /* Transaction Summary */
+    .summary {
+      margin: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .summary h2 {
+      margin-top: 0;
+    }
+
+    .summary form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .summary input, .summary textarea {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .summary button {
+      padding: 10px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="https://via.placeholder.com/50" alt="Logo">
+      <h1>Instant Laundry POS</h1>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#home">Cara Penggunaan</a></li>
+        <li><a href="#about">Tentang</a></li>
+        <li><a href="#contact">Kontak</a></li>
+      </ul>
+      <div class="hamburger">&#9776;</div>
+    </nav>
+  </header>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Cari produk...">
+  </div>
+
+  <div class="product-grid" id="product-grid"></div>
+
+  <div class="pagination" id="pagination"></div>
+
+  <div class="summary" id="summary">
+    <h2>Rangkuman Transaksi</h2>
+    <form id="transaction-form">
+      <!-- Customer Data -->
+      <input type="text" id="name" placeholder="Nama">
+      <input type="text" id="address" placeholder="Alamat">
+      <input type="text" id="whatsapp" placeholder="Nomor WhatsApp">
+      
+      <!-- Product Details -->
+      <textarea id="custom-product" placeholder="Nama produk khusus (jika ada)"></textarea>
+      <input type="number" id="custom-price" placeholder="Harga produk khusus (Rp)">
+      <input type="number" id="custom-amount" placeholder="Jumlah produk khusus">
+
+      <!-- Discount and Down Payment -->
+      <input type="number" id="discount" placeholder="Diskon (Rp)">
+      <input type="number" id="down-payment" placeholder="Uang Muka (Rp)">
+
+      <button type="submit">Kirim Transaksi</button>
+    </form>
+  </div>
+
+  <script>
+    // Fetch products from CSV
+    const csvUrl = 'https://bandarlaundry.github.io/ilp/daftarharga.csv';
+    let products = [];
+    let currentPage = 1;
+    const productsPerPage = 6;
+
+    fetch(csvUrl)
+      .then(response => response.text())
+      .then(data => {
+        const rows = data.split('\n').slice(1); // Skip header
+        products = rows.map(row => {
+          const [name, price, description] = row.split(',');
+          return { name, price: parseFloat(price), description };
+        });
+        renderProducts();
+      })
+      .catch(error => console.error('Error fetching CSV:', error));
+
+    function renderProducts() {
+      const productGrid = document.getElementById('product-grid');
+      const pagination = document.getElementById('pagination');
+      productGrid.innerHTML = '';
+      pagination.innerHTML = '';
+
+      const start = (currentPage - 1) * productsPerPage;
+      const end = start + productsPerPage;
+      const paginatedProducts = products.slice(start, end);
+
+      paginatedProducts.forEach(product => {
+        const item = document.createElement('div');
+        item.className = 'product-item';
+        item.innerHTML = `
+          <img src="https://via.placeholder.com/150" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <p>${product.description}</p>
+          <p>Rp ${product.price.toLocaleString()}</p>
+        `;
+        productGrid.appendChild(item);
+      });
+
+      // Pagination
+      const totalPages = Math.ceil(products.length / productsPerPage);
+      for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.className = currentPage === i ? 'active' : '';
+        button.onclick = () => {
+          currentPage = i;
+          renderProducts();
+        };
+        pagination.appendChild(button);
+      }
+    }
+
+    // Handle transaction form submission
+    document.getElementById('transaction-form').addEventListener('submit', event => {
+      event.preventDefault();
+
+      const customerName = document.getElementById('name').value;
+      const address = document.getElementById('address').value;
+      const whatsapp = document.getElementById('whatsapp').value;
+      const customProduct = document.getElementById('custom-product').value;
+      const customPrice = document.getElementById('custom-price').value;
+      const customAmount = document.getElementById('custom-amount').value;
+      const discount = document.getElementById('discount').value || 0;
+      const downPayment = document.getElementById('down-payment').value || 0;
+
+      const invoice = `INV-${Math.random().toString(36).substr(2, 9)}`;
+      const date = new Date().toLocaleDateString();
+
+      const message = `
+        *Rincian Transaksi*
+        Nama Pelanggan: ${customerName}
+        Alamat: ${address}
+        Nomor WhatsApp: ${whatsapp}
+        Tanggal Transaksi: ${date}
+        Nomor Invoice: ${invoice}
+
+        Produk Khusus: ${customProduct || '-'}
+        Harga Produk: Rp ${customPrice || '-'}
+        Jumlah Produk: ${customAmount || '-'}
+
+        Diskon: Rp ${discount}
+        Uang Muka: Rp ${downPayment}
+      `;
+
+      const whatsappLink = `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappLink, '_blank');
+
+      // Save as TXT
+      const blob = new Blob([message], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${invoice}.txt`;
+      a.click();
+    });
+
+    // Toggle mobile menu
+    document.querySelector('.hamburger').addEventListener('click', () => {
+      const nav = document.querySelector('nav ul');
+      nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+    });
+  </script>
+</body>
+</html>
