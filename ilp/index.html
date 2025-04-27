@@ -156,6 +156,27 @@
       cursor: pointer;
     }
 
+    /* Quick Amount Buttons */
+    .quick-amount {
+      margin-top: 10px;
+    }
+
+    .quick-amount button {
+      margin: 0 5px;
+      padding: 5px 10px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* Hidden Custom Product Section */
+    .custom-product-section {
+      display: none;
+      margin-top: 20px;
+    }
+
     /* Pagination */
     .pagination {
       display: flex;
@@ -212,14 +233,22 @@
       <!-- Selected Products -->
       <div id="selected-products"></div>
 
-      <!-- Custom Product Input -->
-      <textarea id="custom-product" placeholder="Nama produk khusus (jika ada)"></textarea>
-      <input type="number" id="custom-price" placeholder="Harga produk khusus (Rp)">
-      <input type="number" id="custom-amount" placeholder="Jumlah produk khusus">
+      <!-- Total Amount -->
+      <p id="total-amount">Total: Rp 0</p>
 
       <!-- Discount and Down Payment -->
       <input type="number" id="discount" placeholder="Diskon (Rp)">
       <input type="number" id="down-payment" placeholder="Uang Muka (Rp)">
+
+      <!-- Add Custom Product Button -->
+      <button type="button" onclick="toggleCustomProduct()">Tambah Produk Khusus</button>
+
+      <!-- Custom Product Section -->
+      <div class="custom-product-section" id="custom-product-section">
+        <textarea id="custom-product" placeholder="Nama produk khusus (jika ada)"></textarea>
+        <input type="number" id="custom-price" placeholder="Harga produk khusus (Rp)">
+        <input type="number" id="custom-amount" placeholder="Jumlah produk khusus">
+      </div>
 
       <button type="submit">Kirim Transaksi</button>
     </form>
@@ -262,8 +291,12 @@
           <img src="${product.image}" alt="${product.name}">
           <h3>${product.name}</h3>
           <p>Rp ${product.price.toLocaleString()}</p>
+          <div class="quick-amount">
+            <button onclick="addProductToSummary('${product.name}', 1)">+1</button>
+            <button onclick="addProductToSummary('${product.name}', 2)">+2</button>
+            <button onclick="addProductToSummary('${product.name}', 3)">+3</button>
+          </div>
         `;
-        item.onclick = () => addProductToSummary(product);
         productGrid.appendChild(item);
       });
 
@@ -296,21 +329,30 @@
 
     const selectedProducts = {};
 
-    function addProductToSummary(product) {
-      if (!selectedProducts[product.name]) {
-        selectedProducts[product.name] = { ...product, amount: 1 };
+    function addProductToSummary(name, amount) {
+      const product = products.find(p => p.name === name);
+      if (!selectedProducts[name]) {
+        selectedProducts[name] = { ...product, amount: amount };
       } else {
-        selectedProducts[product.name].amount++;
+        selectedProducts[name].amount += amount;
       }
       updateSummary();
+    }
+
+    function toggleCustomProduct() {
+      const customProductSection = document.getElementById('custom-product-section');
+      customProductSection.style.display = customProductSection.style.display === 'none' ? 'block' : 'none';
     }
 
     function updateSummary() {
       const selectedProductsContainer = document.getElementById('selected-products');
       selectedProductsContainer.innerHTML = '';
 
+      let totalAmount = 0;
+
       Object.keys(selectedProducts).forEach(name => {
         const product = selectedProducts[name];
+        totalAmount += product.price * product.amount;
         const productDiv = document.createElement('div');
         productDiv.innerHTML = `
           <p>${product.name} - Rp ${product.price.toLocaleString()} x ${product.amount}</p>
@@ -318,6 +360,9 @@
         `;
         selectedProductsContainer.appendChild(productDiv);
       });
+
+      // Update total amount
+      document.getElementById('total-amount').textContent = `Total: Rp ${totalAmount.toLocaleString()}`;
     }
 
     function removeProduct(name) {
@@ -351,18 +396,23 @@
         Produk Terpilih:
       `;
 
+      let totalAmount = 0;
+
       Object.keys(selectedProducts).forEach(name => {
         const product = selectedProducts[name];
+        totalAmount += product.price * product.amount;
         message += `\n- ${product.name} x ${product.amount} = Rp ${(product.price * product.amount).toLocaleString()}`;
       });
 
       if (customProduct && customPrice && customAmount) {
+        totalAmount += customPrice * customAmount;
         message += `\n- ${customProduct} x ${customAmount} = Rp ${(customPrice * customAmount).toLocaleString()}`;
       }
 
       message += `
         Diskon: Rp ${discount}
         Uang Muka: Rp ${downPayment}
+        Total Akhir: Rp ${(totalAmount - discount - downPayment).toLocaleString()}
       `;
 
       const whatsappLink = `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`;
