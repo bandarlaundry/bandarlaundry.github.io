@@ -349,10 +349,10 @@
           const [name, description, price, image] = row.split(',');
           const parsedPrice = parseFloat(price);
           return { 
-            name: name || 'Produk Tanpa Nama', 
-            description: description || 'Tidak ada deskripsi', 
-            price: isNaN(parsedPrice) ? 0 : parsedPrice, 
-            image: image || 'https://via.placeholder.com/150' 
+            name: name || 'Aplikasi Laundry', 
+            description: description || 'Transaski dengan pelanggan kini lebih mudah dan aman. Kirim bukti via Whatsapp cetak struk dengan skeli klik. Data Anda dijamin aman karena ini tidak disimpan di server.', 
+            price: isNaN(parsedPrice) ? 185000 : parsedPrice, 
+            image: image || 'https://ratakan.com/uploads/prd-23a9425ac5.png' 
           };
         });
         renderProducts();
