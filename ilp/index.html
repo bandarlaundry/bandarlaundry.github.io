@@ -181,6 +181,59 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
+    /* Custom Product Section */
+    .custom-product-section {
+      margin-top: 20px;
+      display: none;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .custom-product-section textarea,
+    .custom-product-section input {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    footer p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    footer ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0;
+    }
+
+    footer ul li {
+      display: inline-block;
+      margin: 0 10px;
+    }
+
+    footer ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    footer .social-media a {
+      margin: 0 10px;
+      font-size: 20px;
+      color: #fff;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -230,9 +283,34 @@
       <input type="number" id="down-payment" placeholder="Uang Muka (Rp)">
       <button type="button" class="update-button" onclick="updateTotal()">Update Total</button>
 
+      <!-- Add Custom Product Button -->
+      <button type="button" onclick="toggleCustomProduct()">Tambah Produk Khusus</button>
+
+      <!-- Custom Product Section -->
+      <div class="custom-product-section" id="custom-product-section">
+        <textarea id="custom-product" placeholder="Nama produk khusus (jika ada)"></textarea>
+        <input type="number" id="custom-price" placeholder="Harga produk khusus (Rp)">
+        <input type="number" id="custom-amount" placeholder="Jumlah produk khusus">
+        <button type="button" onclick="addCustomProduct()">Tambahkan Produk Khusus</button>
+      </div>
+
       <button type="submit">Kirim Transaksi</button>
     </form>
   </div>
+
+  <footer>
+    <p>&copy; 2023 Instant Laundry POS. All rights reserved.</p>
+    <ul>
+      <li><a href="#home">Beranda</a></li>
+      <li><a href="#about">Tentang Kami</a></li>
+      <li><a href="#contact">Kontak</a></li>
+    </ul>
+    <div class="social-media">
+      <a href="https://facebook.com" target="_blank">&#xf39e;</a> <!-- Facebook Icon -->
+      <a href="https://instagram.com" target="_blank">&#xf16d;</a> <!-- Instagram Icon -->
+      <a href="https://youtube.com" target="_blank">&#xf167;</a> <!-- YouTube Icon -->
+    </div>
+  </footer>
 
   <script>
     // Fetch products from CSV
@@ -338,6 +416,31 @@
         selectedProducts[name].amount += amount;
       }
       updateSummary();
+    }
+
+    function toggleCustomProduct() {
+      const customProductSection = document.getElementById('custom-product-section');
+      customProductSection.style.display = customProductSection.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function addCustomProduct() {
+      const name = document.getElementById('custom-product').value.trim();
+      const price = parseFloat(document.getElementById('custom-price').value) || 0;
+      const amount = parseInt(document.getElementById('custom-amount').value) || 0;
+
+      if (name && amount > 0) {
+        if (!selectedProducts[name]) {
+          selectedProducts[name] = { name, price, amount };
+        } else {
+          selectedProducts[name].amount += amount;
+        }
+        updateSummary();
+        document.getElementById('custom-product').value = '';
+        document.getElementById('custom-price').value = '';
+        document.getElementById('custom-amount').value = '';
+      } else {
+        alert('Harap isi nama produk dan jumlah dengan benar.');
+      }
     }
 
     function updateSummary() {
