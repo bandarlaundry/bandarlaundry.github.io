@@ -268,7 +268,13 @@
         const rows = data.split('\n').slice(1); // Skip header
         products = rows.map(row => {
           const [name, description, price, image] = row.split(',');
-          return { name, description, price: parseFloat(price), image };
+          const parsedPrice = parseFloat(price);
+          return { 
+            name: name || 'Produk Tanpa Nama', 
+            description: description || 'Tidak ada deskripsi', 
+            price: isNaN(parsedPrice) ? 0 : parsedPrice, 
+            image: image || 'https://via.placeholder.com/150' 
+          };
         });
         renderProducts();
       })
@@ -291,7 +297,8 @@
         item.innerHTML = `
           <img src="${product.image}" alt="${product.name}">
           <h3>${product.name}</h3>
-          <p>Rp ${product.price.toLocaleString()}</p>
+          <p>${product.description}</p>
+          <p>${product.price === 0 ? 'Gratis' : `Rp ${product.price.toLocaleString()}`}</p>
           <button onclick="addProductToSummary('${product.name}', 1)">Tambah ke Rangkuman</button>
         `;
         productGrid.appendChild(item);
@@ -342,11 +349,11 @@
     }
 
     function addCustomProduct() {
-      const name = document.getElementById('custom-product').value;
-      const price = parseFloat(document.getElementById('custom-price').value);
-      const amount = parseInt(document.getElementById('custom-amount').value);
+      const name = document.getElementById('custom-product').value.trim();
+      const price = parseFloat(document.getElementById('custom-price').value) || 0;
+      const amount = parseInt(document.getElementById('custom-amount').value) || 0;
 
-      if (name && price && amount) {
+      if (name && amount > 0) {
         if (!selectedProducts[name]) {
           selectedProducts[name] = { name, price, amount };
         } else {
@@ -357,7 +364,7 @@
         document.getElementById('custom-price').value = '';
         document.getElementById('custom-amount').value = '';
       } else {
-        alert('Harap isi semua kolom untuk produk khusus.');
+        alert('Harap isi nama produk dan jumlah dengan benar.');
       }
     }
 
@@ -372,7 +379,7 @@
         totalAmount += product.price * product.amount;
         const productDiv = document.createElement('div');
         productDiv.innerHTML = `
-          <p>${product.name} - Rp ${product.price.toLocaleString()} x ${product.amount}</p>
+          <p>${product.name} - ${product.price === 0 ? 'Gratis' : `Rp ${product.price.toLocaleString()} x ${product.amount}`}</p>
           <button onclick="removeProduct('${name}')">Hapus</button>
         `;
         selectedProductsContainer.appendChild(productDiv);
@@ -432,7 +439,7 @@
       Object.keys(selectedProducts).forEach(name => {
         const product = selectedProducts[name];
         totalAmount += product.price * product.amount;
-        message += `\n- ${product.name} x ${product.amount} = Rp ${(product.price * product.amount).toLocaleString()}`;
+        message += `\n- ${product.name} x ${product.amount} = ${product.price === 0 ? 'Gratis' : `Rp ${(product.price * product.amount).toLocaleString()}`}`;
       });
 
       const discountAmount = (totalAmount * discount) / 100;
