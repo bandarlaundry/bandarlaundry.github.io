@@ -533,11 +533,11 @@
 
       let message = `
         *BANDAR LAUNDRY*
-		    Perum GAS blok y
-		    Cileungsi, Bogor
-		    www.bandarlaundry.com
-		    WA 085773009666
-		    =====================
+	Perum GAS blok y
+	Cileungsi, Bogor
+	www.bandarlaundry.com
+	WA 085773009666
+	=====================
         Nama Pelanggan: ${customerName}
         Alamat: ${address}
         Nomor WhatsApp: ${whatsapp}
@@ -562,6 +562,8 @@
         Diskon (${discount}%): Rp ${discountAmount.toLocaleString()}
         Uang Muka: Rp ${downPayment.toLocaleString()}
         Total Akhir: Rp ${finalAmount.toLocaleString()}
+
+       Terimakasih sudah menggunakan jasa kami.
       `;
 
       const whatsappLink = `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`;
