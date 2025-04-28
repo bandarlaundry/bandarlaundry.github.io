@@ -1,25 +1,22 @@
- // Login
-// Add this at the beginning of script.js
+ // Login System
 const allowedUsers = [
   { email: "bandarlaundry@gmail.com", password: "password123" },
   { email: "bandardeterjen@gmail.com", password: "password456" },
   { email: "aiindonesiaart@gmail.com", password: "password789" }
 ];
 
-// Notification element (we'll add this to HTML)
-function showNotification(message, isError = true) {
+function showNotification(message, isSuccess = false) {
   const notification = document.getElementById('login-notification');
   notification.textContent = message;
-  notification.style.color = isError ? '#d32f2f' : '#388e3c';
+  notification.className = isSuccess ? 'notification success' : 'notification error';
   notification.style.display = 'block';
   
-  // Hide after 5 seconds
   setTimeout(() => {
     notification.style.display = 'none';
   }, 5000);
 }
 
-document.getElementById('login-form').addEventListener('submit', function(event) {
+function handleLogin(event) {
   event.preventDefault();
   
   const email = document.getElementById('email').value.trim();
@@ -33,36 +30,40 @@ document.getElementById('login-form').addEventListener('submit', function(event)
       document.getElementById('login-container').style.display = 'none';
       document.getElementById('main-content').style.display = 'block';
       
-      // Store login state in localStorage
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('userEmail', email);
       
-      showNotification('Login berhasil! Mengalihkan...', false);
+      showNotification('Login successful! Redirecting...', true);
     } else {
-      showNotification('Password salah. Silakan coba lagi.');
+      showNotification('Incorrect password. Please try again.');
     }
   } else {
-    showNotification('Email tidak terdaftar. Hanya email tertentu yang diizinkan.');
+    showNotification('Email not registered. Access restricted.');
   }
-});
+}
 
-// Check if user is already logged in when page loads
-window.addEventListener('DOMContentLoaded', function() {
-  const isLoggedIn = localStorage.getItem('isLoggedIn');
-  if (isLoggedIn === 'true') {
+// Initialize login system
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if already logged in
+  if (localStorage.getItem('isLoggedIn') {
     document.getElementById('login-container').style.display = 'none';
     document.getElementById('main-content').style.display = 'block';
   }
+  
+  // Setup login form
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', handleLogin);
+  }
 });
 
-// Logout function
+// Logout function (add this to your existing code)
 function logout() {
   localStorage.removeItem('isLoggedIn');
   localStorage.removeItem('userEmail');
   document.getElementById('login-container').style.display = 'flex';
   document.getElementById('main-content').style.display = 'none';
-  document.getElementById('email').value = '';
-  document.getElementById('password').value = '';
+  window.location.reload();
 }
 
  // Fetch products from CSV
