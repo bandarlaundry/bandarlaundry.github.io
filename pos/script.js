@@ -1,5 +1,5 @@
  // Fetch products from CSV
-    const csvUrl = 'https://bandarlaundry.github.io/ilp/daftarharga.csv';
+    const csvUrl = 'https://bandarlaundry.github.io/pos/daftarharga.csv';
     let products = [];
     let currentPage = 1;
     const productsPerPage = 10;
