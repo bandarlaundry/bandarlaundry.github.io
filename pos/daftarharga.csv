@@ -1,14 +1,14 @@
 name,description,price,image
-Laundry Reguler,Laundry kiloan selesai dalam 3 hari kerja,9000,https://bandarlaundry.github.io/pos/image/lpos-laundry-reguler.png
-Laundry Ekspres,Laundry kiloan selesai dalam 1 hari kerja,12000,https://bandarlaundry.github.io/pos/image/lpos-laundry-ekspres.png
-Laundry Kilat,Laundry kiloan selesai dalam 6 jam bisa ditunggu,15000,https://bandarlaundry.github.io/pos/image/lpos-laundry-kilat.png
-Karpet Sedang,Karpet ukuran sedang dihitung dalam per meter persegi,15000,https://bandarlaundry.github.io/pos/image/lpos-laundry-karpet-sedang.png
+Laundry Reguler,Laundry kiloan selesai dalam 3 hari kerja dijamin bersih rapi wangi tepat waktu,9000,https://bandarlaundry.github.io/pos/image/lpos-laundry-reguler.png
+Laundry Ekspres,Laundry kiloan selesai dalam 1 hari kerja dijamin bersih rapi wangi tepat waktu,12000,https://bandarlaundry.github.io/pos/image/lpos-laundry-ekspres.png
+Laundry Kilat,Laundry kiloan selesai dalam 6 jam bisa ditunggu atau kita antar,15000,https://bandarlaundry.github.io/pos/image/lpos-laundry-kilat.png
+Karpet Sedang,Laundry karpet ukuran sedang dihitung dalam per meter persegi panjang dikalikan lebar,15000,https://bandarlaundry.github.io/pos/image/lpos-laundry-karpet-sedang.png
 Perlengkapan Sholat,Perlengkapan sholat gratis untuk pelanggan setia,0,https://bandarlaundry.github.io/pos/image/lpos-perlengkapan-sholat.png
-Karpet Tebal,Karpet tebal dihitung dalam per meter persegi,17500,https://bandarlaundry.github.io/pos/image/lpos-laundry-karpet-tebal.png
-Karpet Tipis,Karpet tipis dihitung dalam per meter persegi,12500,https://bandarlaundry.github.io/pos/image/lpos-laundry-karpet-tipis.png
-Bedcover Queen,Bedcover ukuran queen 160 x 210 cm,30000,https://bandarlaundry.github.io/pos/image/lpos-laundry-bedcover-queen.png
-Bedcover King,Bedcover ukuran King besar 180 x 200 cm,35000,https://bandarlaundry.github.io/pos/image/lpos-laundry-bedcover-king.png
-Bedcover Single,Bedcover ukuran single kecil 100 x 200 cm,25000,https://bandarlaundry.github.io/pos/image/lpos-laundry-bedcover-single.png
+Karpet Tebal,Laundry karpet tebal dihitung dalam per meter persegi panjang dikalikan lebar,17500,https://bandarlaundry.github.io/pos/image/lpos-laundry-karpet-tebal.png
+Karpet Tipis,Laundry karpet tipis dihitung dalam per meter persegi panjang dikalikan lebar,12500,https://bandarlaundry.github.io/pos/image/lpos-laundry-karpet-tipis.png
+Bedcover Queen,Laundry bedcover ukuran sedang queen 160 x 210 cm di bawah king,30000,https://bandarlaundry.github.io/pos/image/lpos-laundry-bedcover-queen.png
+Bedcover King,Laundry bedcover ukuran King besar 180 x 200 cm di bawah super king,35000,https://bandarlaundry.github.io/pos/image/lpos-laundry-bedcover-king.png
+Bedcover Single,Laundry bedcover ukuran single kecil 100 x 200 cm muat satu orang,25000,https://bandarlaundry.github.io/pos/image/lpos-laundry-bedcover-single.png
 Boneka <15cm,Boneka kecil bersih dalam 2 hari,0,https://via.placeholder.com/150?text=Boneka+Kecil
 Boneka 20-30 cm,Boneka sedang bersih dalam 2 hari,11500,https://via.placeholder.com/150?text=Boneka+20-30
 Boneka 30-40 cm,Boneka sedang bersih dalam 2 hari,15000,https://via.placeholder.com/150?text=Boneka+30-40
