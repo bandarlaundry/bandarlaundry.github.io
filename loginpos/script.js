@@ -1,19 +1,34 @@
  // Login
-const allowedEmails = [
-  "bandarlaundry@gmail.com",
-  "bandardeterjen@gmail.com",
-  "aiindonesiaart@gmail.com"
+// Add this at the beginning of script.js
+const allowedUsers = [
+  { email: "bandarlaundry@gmail.com", password: "password123" },
+  { email: "bandardeterjen@gmail.com", password: "password456" },
+  { email: "aiindonesiaart@gmail.com", password: "password789" }
 ];
-const allowedPassword = "password123"; // Change this to your desired password
+
+// Notification element (we'll add this to HTML)
+function showNotification(message, isError = true) {
+  const notification = document.getElementById('login-notification');
+  notification.textContent = message;
+  notification.style.color = isError ? '#d32f2f' : '#388e3c';
+  notification.style.display = 'block';
+  
+  // Hide after 5 seconds
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 5000);
+}
 
 document.getElementById('login-form').addEventListener('submit', function(event) {
   event.preventDefault();
   
-  const email = document.getElementById('email').value;
+  const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
   
-  if (allowedEmails.includes(email) {
-    if (password === allowedPassword) {
+  const user = allowedUsers.find(u => u.email === email);
+  
+  if (user) {
+    if (user.password === password) {
       // Successful login
       document.getElementById('login-container').style.display = 'none';
       document.getElementById('main-content').style.display = 'block';
@@ -21,11 +36,13 @@ document.getElementById('login-form').addEventListener('submit', function(event)
       // Store login state in localStorage
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('userEmail', email);
+      
+      showNotification('Login berhasil! Mengalihkan...', false);
     } else {
-      alert('Password salah. Silakan coba lagi.');
+      showNotification('Password salah. Silakan coba lagi.');
     }
   } else {
-    alert('Email tidak terdaftar. Hanya email tertentu yang diizinkan.');
+    showNotification('Email tidak terdaftar. Hanya email tertentu yang diizinkan.');
   }
 });
 
@@ -38,13 +55,14 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// Add logout functionality (optional)
-// You can add a logout button in your header that calls this:
+// Logout function
 function logout() {
   localStorage.removeItem('isLoggedIn');
   localStorage.removeItem('userEmail');
   document.getElementById('login-container').style.display = 'flex';
   document.getElementById('main-content').style.display = 'none';
+  document.getElementById('email').value = '';
+  document.getElementById('password').value = '';
 }
 
  // Fetch products from CSV
