@@ -54,6 +54,24 @@
   background-color: #0056b3;
 }
 
+/* Notification Styles */
+.notification {
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+  display: none;
+}
+
+/* Login Form Adjustments */
+.login-form {
+  position: relative;
+}
+
+.login-form h2 {
+  margin-top: 0;
+}
     header {
       display: flex;
       justify-content: space-between;
