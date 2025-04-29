@@ -9,38 +9,36 @@
 </head>
 <body>
 
-<!-- Login Container -->
-<div class="login-container" id="login-container">
-  <div class="login-form">
-    <h2>Login</h2>
-    <div id="login-notification" class="notification" style="display: none;"></div>
-    <form id="login-form">
-      <input type="email" id="email" placeholder="Email" required>
-      <input type="password" id="password" placeholder="Password" required>
-      <button type="submit">Login</button>
-    </form>
+<!-- Login Form -->
+<div id="loginForm" style="display: block;">
+  <div class="login-container">
+    <div class="login-form">
+      <h2>Login</h2>
+      <div id="error-message" class="error-message" style="display: none;"></div>
+      <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+    </div>
   </div>
 </div>
 
-
-<!-- content page -->
-<div class="main-content" id="main-content" style="display: none;">
+<!-- Main Content (wrap all your existing content in this div) -->
+<div id="content" style="display: none;">
   <header>
-    <div class="logo">
-      <img src="https://raw.githubusercontent.com/bandarlaundry/blog/refs/heads/images/bandarlaundry-logo-tr.png" alt="Logo">
-      <h1>Instant Laundry POS</h1>
-    </div>
+    <!-- Your existing header content -->
     <nav>
       <ul>
         <li><a href="/pos/">Beranda</a></li>
         <li><a href="#tutorial">Cara Transaksi</a></li>
-        <li><a href="#" onclick="logout()">Logout</a></li>
+        <li><a href="#" id="logoutBtn">Logout</a></li>
       </ul>
       <div class="hamburger">&#9776;</div>
     </nav>
   </header>
-
-  <div class="search-bar">
+  
+ <div class="search-bar">
     <input type="text" id="search-input" placeholder="Cari produk...">
   </div>
 
@@ -112,6 +110,10 @@
       <a href="https://youtube.com/bandarlaundry" target="_blank"><i class="fa fa-youtube"></i></a> <!-- YouTube Icon -->
     </div>
   </footer>
+  
+  <div class="expiry-info">
+    Session valid until: <span id="expiryDate"></span>
+  </div>
 </div>
 
   <script src="script.js"></script>
