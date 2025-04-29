@@ -317,7 +317,6 @@
 }
 
 .expiry-info {
-  position: fixed;
   bottom: 10px;
   right: 10px;
   background: rgba(0, 0, 0, 0.7);
