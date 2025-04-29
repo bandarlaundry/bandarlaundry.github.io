@@ -1,70 +1,90 @@
- // Login System
-const allowedUsers = [
-  { email: "bandarlaundry@gmail.com", password: "password123" },
-  { email: "bandardeterjen@gmail.com", password: "password456" },
-  { email: "aiindonesiaart@gmail.com", password: "password789" }
-];
+ document.addEventListener('DOMContentLoaded', function () {
+  const loginFormContainer = document.getElementById('loginForm');
+  const loginForm = document.querySelector('#loginForm form');
+  const content = document.getElementById('content');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const errorMessage = document.getElementById('error-message');
+  const expiryDateElement = document.getElementById('expiryDate');
 
-function showNotification(message, isSuccess = false) {
-  const notification = document.getElementById('login-notification');
-  notification.textContent = message;
-  notification.className = isSuccess ? 'notification success' : 'notification error';
-  notification.style.display = 'block';
-  
-  setTimeout(() => {
-    notification.style.display = 'none';
-  }, 5000);
-}
+  // Define valid email-password pairs with validity periods (in days)
+  const validUsers = [
+    { email: 'bandarlaundry@gmail.com', password: 'password123', validityPeriod: 7 }, // 7 days
+    { email: 'bandardeterjen@gmail.com', password: 'password456', validityPeriod: 14 }, // 14 days
+    { email: 'aiindonesiaart@gmail.com', password: 'password789', validityPeriod: 30 } // 30 days
+  ];
 
-function handleLogin(event) {
-  event.preventDefault();
-  
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
-  
-  const user = allowedUsers.find(u => u.email === email);
-  
-  if (user) {
-    if (user.password === password) {
-      // Successful login
-      document.getElementById('login-container').style.display = 'none';
-      document.getElementById('main-content').style.display = 'block';
-      
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', email);
-      
-      showNotification('Login successful! Redirecting...', true);
+  // Check if the user is already logged in
+  const storedData = localStorage.getItem('loginData');
+  if (storedData) {
+    const { email, expiry } = JSON.parse(storedData);
+    const now = new Date().getTime();
+
+    if (now < expiry) {
+      // User is still logged in
+      showContent(email, expiry);
     } else {
-      showNotification('Incorrect password. Please try again.');
+      // Login expired
+      localStorage.removeItem('loginData');
     }
-  } else {
-    showNotification('Email not registered. Access restricted.');
   }
-}
 
-// Initialize login system
-document.addEventListener('DOMContentLoaded', function() {
-  // Check if already logged in
-  if (localStorage.getItem('isLoggedIn') {
-    document.getElementById('login-container').style.display = 'none';
-    document.getElementById('main-content').style.display = 'block';
+  // Handle login form submission
+  loginForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    // Validate email and password against the validUsers array
+    const user = validUsers.find(user => user.email === email && user.password === password);
+
+    if (user) {
+      errorMessage.style.display = 'none';
+
+      // Calculate expiration date based on the user's validity period
+      const now = new Date().getTime();
+      const validityInMilliseconds = user.validityPeriod * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+      const expiry = now + validityInMilliseconds;
+
+      // Store login data in localStorage
+      const loginData = { email, expiry };
+      localStorage.setItem('loginData', JSON.stringify(loginData));
+
+      // Show content
+      showContent(email, expiry);
+    } else {
+      errorMessage.textContent = 'Invalid email or password';
+      errorMessage.style.display = 'block';
+    }
+  });
+
+  // Handle logout button click
+  logoutBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    localStorage.removeItem('loginData'); // Remove login data
+    hideContent(); // Hide content and show login form
+  });
+
+  // Function to show content and set the expiry date
+  function showContent(email, expiry) {
+    loginFormContainer.style.display = 'none';
+    content.style.display = 'block';
+    expiryDateElement.textContent = new Date(expiry).toLocaleString();
   }
-  
-  // Setup login form
-  const loginForm = document.getElementById('login-form');
-  if (loginForm) {
-    loginForm.addEventListener('submit', handleLogin);
+
+  // Function to hide content and show login form
+  function hideContent() {
+    loginForm.reset();
+    loginFormContainer.style.display = 'block';
+    content.style.display = 'none';
+    errorMessage.style.display = 'none';
   }
 });
 
-// Logout function (add this to your existing code)
-function logout() {
-  localStorage.removeItem('isLoggedIn');
-  localStorage.removeItem('userEmail');
-  document.getElementById('login-container').style.display = 'flex';
-  document.getElementById('main-content').style.display = 'none';
-  window.location.reload();
-}
+// Prevent right-click context menu
+document.addEventListener('contextmenu', function(event) {
+  event.preventDefault();
+});
 
  // Fetch products from CSV
     const csvUrl = 'https://bandarlaundry.github.io/pos/daftarharga.csv';
