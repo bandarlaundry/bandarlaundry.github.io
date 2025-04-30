@@ -9,30 +9,30 @@ Karpet Tipis,Laundry karpet tipis dihitung dalam per meter persegi panjang dikal
 Bedcover Queen,Laundry bedcover ukuran sedang queen 160 x 210 cm di bawah king,30000,https://bandarlaundry.github.io/pos/image/lpos-laundry-bedcover-queen.png
 Bedcover King,Laundry bedcover ukuran King besar 180 x 200 cm di bawah super king,35000,https://bandarlaundry.github.io/pos/image/lpos-laundry-bedcover-king.png
 Bedcover Single,Laundry bedcover ukuran single kecil 100 x 200 cm muat satu orang,25000,https://bandarlaundry.github.io/pos/image/lpos-laundry-bedcover-single.png
-Boneka <15cm,Boneka kecil bersih dalam 2 hari,0,https://via.placeholder.com/150?text=Boneka+Kecil
-Boneka 20-30 cm,Boneka sedang bersih dalam 2 hari,11500,https://via.placeholder.com/150?text=Boneka+20-30
-Boneka 30-40 cm,Boneka sedang bersih dalam 2 hari,15000,https://via.placeholder.com/150?text=Boneka+30-40
-Boneka 40-50 cm,Boneka besar bersih dalam 2 hari,18500,https://via.placeholder.com/150?text=Boneka+40-50
-Boneka 50-70 cm,Boneka besar bersih dalam 2 hari,26000,https://via.placeholder.com/150?text=Boneka+50-70
-Boneka 70-80 cm,Boneka besar bersih dalam 2 hari,33000,https://via.placeholder.com/150?text=Boneka+70-80
-Boneka 80-100 cm,Boneka besar bersih dalam 2 hari,40000,https://via.placeholder.com/150?text=Boneka+80-100
-Sepatu Balap,Sepatu balap bersih dalam 2 hari,14000,https://via.placeholder.com/150?text=Sepatu+Balap
-Sepatu Balap Anak,Sepatu balap anak bersih dalam 2 hari,14000,https://via.placeholder.com/150?text=Sepatu+Balap+Anak
-Sepatu Balet Anak,Sepatu balet anak bersih dalam 2 hari,15500,https://via.placeholder.com/150?text=Sepatu+Balet+Anak
-Sepatu Boot,Sepatu boot bersih dalam 2 hari,27000,https://via.placeholder.com/150?text=Sepatu+Boot
-Sepatu Olahraga,Sepatu olahraga bersih dalam 2 hari,24500,https://via.placeholder.com/150?text=Sepatu+Olahraga
-Sepatu Olahraga Anak,Sepatu olahraga anak bersih dalam 2 hari,12000,https://via.placeholder.com/150?text=Sepatu+Olahraga+Anak
-Sepatu Pantofel Kulit,Sepatu pantofel kulit bersih dalam 2 hari,29000,https://via.placeholder.com/150?text=Sepatu+Pantofel+Kulit
-Sepatu Pantofel Kulit Anak,Sepatu pantofel kulit anak bersih dalam 2 hari,14000,https://via.placeholder.com/150?text=Sepatu+Pantofel+Kulit+Anak
-Sepatu Wanita,Sepatu wanita bersih dalam 2 hari,27500,https://via.placeholder.com/150?text=Sepatu+Wanita
-Sepatu Wanita Sebetis,Sepatu wanita sebetis bersih dalam 2 hari,37500,https://via.placeholder.com/150?text=Sepatu+Wanita+Sebetis
-Kasur Busa Besar,Kasur busa besar bersih dalam 2 hari,50500,https://via.placeholder.com/150?text=Kasur+Busa+Besar
-Kasur Busa Double,Kasur busa double bersih dalam 2 hari,55000,https://via.placeholder.com/150?text=Kasur+Busa+Double
-Kasur Busa Kecil,Kasur busa kecil bersih dalam 2 hari,36000,https://via.placeholder.com/150?text=Kasur+Busa+Kecil
-Kasur Busa Keranjang,Kasur busa keranjang bersih dalam 2 hari,21000,https://via.placeholder.com/150?text=Kasur+Busa+Keranjang
-Kasur Busa Single,Kasur busa single bersih dalam 2 hari,48500,https://via.placeholder.com/150?text=Kasur+Busa+Single
-Kasur Dakron Besar,Kasur dakron besar bersih dalam 2 hari,50500,https://via.placeholder.com/150?text=Kasur+Dakron+Besar
-Kasur Dakron Sedang,Kasur dakron sedang bersih dalam 2 hari,43000,https://via.placeholder.com/150?text=Kasur+Dakron+Sedang
-Kasur Palembang Besar,Kasur palembang besar bersih dalam 2 hari,50500,https://via.placeholder.com/150?text=Kasur+Palembang+Besar
-Kasur Palembang Sedang,Kasur palembang sedang bersih dalam 2 hari,43000,https://via.placeholder.com/150?text=Kasur+Palembang+Sedang
-Kasur Palembang Single,Kasur palembang single bersih dalam 2 hari,41500,https://via.placeholder.com/150?text=Kasur+Palembang+Single
+Boneka <15cm,Laundry boneka kecil ukuran kurang dari 15 cm dihitung satuan,8500,https://bandarlaundry.github.io/pos/image/lpos-laundry-boneka-15.png
+Boneka 20-30 cm,Laundry boneka kecil ukuran 20 sampai 30 cm dihitung satuan,11500,https://bandarlaundry.github.io/pos/image/lpos-laundry-boneka-20.png
+Boneka 30-40 cm,Laundry boneka sedang ukuran 30 sampai 40 cm dihitung satuan,15000,https://bandarlaundry.github.io/pos/image/lpos-laundry-boneka-30.png
+Boneka 40-50 cm,Laundry boneka sedang ukuran 40 sampai 50 cm dihitung satuan,18500,https://bandarlaundry.github.io/pos/image/lpos-laundry-boneka-40.png
+Boneka 50-70 cm,Laundry boneka besar ukuran 50 sampai 70 cm dihitung satuan,26000,https://bandarlaundry.github.io/pos/image/lpos-laundry-boneka-50.png
+Boneka 70-80 cm,Laundry boneka besar ukuran 70 sampai 80 cm dihitung satuan,33000,https://bandarlaundry.github.io/pos/image/lpos-laundry-boneka-70.png
+Boneka 80-100 cm,Laundry boneka jumbo ukuran 80 sampai 100 cm dihitung satuan,40000,https://bandarlaundry.github.io/pos/image/lpos-laundry-boneka-80.png
+Sepatu Balap, Laundry sepatu balap dewasa dihitung satuan,14000,https://bandarlaundry.github.io/pos/image/lpos-laundry-sepatu-balap.png
+Sepatu Balap Anak,Laundry sepatu balap anak dihitung satuan,14000,https://bandarlaundry.github.io/pos/image/lpos-laundry-sepatu-balap-anak.png
+Sepatu Balet Anak,Laundry sepatu balet anak dihitung satuan,15500,https://bandarlaundry.github.io/pos/image/lpos-laundry-sepatu-balet-anak.png
+Sepatu Boot,Laundry sepatu boot dewasa dihitung satuan,27000,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Sepatu Olahraga,Laundry sepatu olahraga dewasa dihitung satuan,24500,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Sepatu Olahraga Anak,Laundry sepatu olahraga anak dihitung satuan,12000,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Sepatu Pantofel Kulit,Laundry sepatu kulit pantofel untuk dewasa dihitung satuan,29000,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Sepatu Pantofel Kulit Anak,Laundry sepatu kulit pantofel untuk anak dihitung satuan,14000,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Sepatu Wanita,Laundry sepatu khusus untuk wanita dewasa dihitung satuan,27500,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Sepatu Wanita Sebetis,Laundry sepatu khusus  ukuran sebetis untuk wanita dewasa dihitung satuan,37500,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Kasur Busa Besar,Laundry kasur busa ukuran besar dihitung satuan,50500,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Kasur Busa Double,Laundry kasur busa ukuran double dihitung satuan,55000,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Kasur Busa Kecil,Laundry kasur busa ukuran kecil dihitung satuan,36000,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Kasur Busa Keranjang,Laundry kasur busa jenis keranjang dihitung satuan,21000,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Kasur Busa Single,Laundry kasur busa ukuran single dihitung satuan,48500,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Kasur Dakron Besar,Laundry kasur jenis dakron ukuran besar dihitung satuan,50500,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Kasur Dakron Sedang,Laundry kasur jenis dakron ukuran sedang dihitung satuan,43000,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Kasur Palembang Besar,Laundry kasur jenis palembang ukuran besar dihitung satuan,50500,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Kasur Palembang Sedang,Laundry kasur jenis palembang ukuran sedang dihitung satuan,43000,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
+Kasur Palembang Single,Laundry kasur jenis palembang ukuran single dihitung satuan,41500,https://bandarlaundry.github.io/pos/image/lpos-laundry-satuan.png
