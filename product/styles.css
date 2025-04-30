@@ -236,6 +236,38 @@ header {
     }
 }
 
+/* Ensure proper image display */
+.featured-image {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.featured-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Improve post content readability */
+.post-body {
+    line-height: 1.7;
+    font-size: 1.1rem;
+}
+
+.post-body p {
+    margin-bottom: 1.2rem;
+}
+
+.post-body ul, .post-body ol {
+    margin: 1.2rem 0;
+    padding-left: 2rem;
+}
+
+.post-body li {
+    margin-bottom: 0.5rem;
+}
+
 /* Main Content */
 main {
     flex: 1;
