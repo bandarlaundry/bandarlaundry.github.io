@@ -391,30 +391,51 @@ async function loadSinglePost() {
     }
 }
 
-// Format post content with proper HTML
 function formatPostContent(text) {
     if (!text) return '<p>No content available</p>';
     
+    // First, split by double newlines to get paragraphs
     let paragraphs = text.split(/\n\s*\n/);
+    let inList = false;
+    let output = '';
     
-    return paragraphs.map(para => {
-        if (!para.trim()) return '';
+    paragraphs.forEach(para => {
+        if (!para.trim()) return;
         
-        para = para.replace(/([^\n])\n([^\n•\-*\d])/g, '$1<br>$2');
-        para = para.replace(/^(\s*[\-*•]\s+)/gm, '<li>');
-        para = para.replace(/^(\s*\d+\.\s+)/gm, '<li>');
+        // Check if this paragraph starts a list
+        const isListItem = /^(\s*[\-*•]\s+|\s*\d+\.\s+)/.test(para);
         
-        if (para.includes('<li>')) {
-            para = para.replace(/<li>/g, '</li><li>').replace('</li>', '');
-            para = `<ul>${para}</ul>`;
+        if (isListItem && !inList) {
+            // Start a new list
+            output += '<ul>';
+            inList = true;
+        } else if (!isListItem && inList) {
+            // Close the previous list
+            output += '</ul>';
+            inList = false;
         }
         
-        if (!para.startsWith('<ul>')) {
-            para = `<p>${para}</p>`;
+        // Process the paragraph content
+        if (isListItem) {
+            // It's a list item - replace bullet/number with <li>
+            para = para.replace(/^(\s*[\-*•]\s+|\s*\d+\.\s+)/, '');
+            output += `<li>${para.replace(/\n/g, '<br>')}</li>`;
+        } else {
+            // It's a regular paragraph
+            if (inList) {
+                output += '</ul>';
+                inList = false;
+            }
+            output += `<p>${para.replace(/\n/g, '<br>')}</p>`;
         }
-        
-        return para;
-    }).join('');
+    });
+    
+    // Close any remaining open list
+    if (inList) {
+        output += '</ul>';
+    }
+    
+    return output;
 }
 
 // Initialize link interception for SPA behavior
