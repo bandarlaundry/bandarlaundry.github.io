@@ -149,7 +149,7 @@ function handleRouting() {
     const slug = urlParams.get('slug');
     
     if (year && month && day && slug) {
-        const prettyUrl = `/${year}/${month}/${day}/${slug}.html`;
+        const prettyUrl = `/product/${year}/${month}/${day}/${slug}.html`;
         window.history.replaceState(null, null, prettyUrl);
         loadSinglePost();
     } 
@@ -391,10 +391,11 @@ async function loadSinglePost() {
     }
 }
 
+// Format post content with proper HTML
 function formatPostContent(text) {
     if (!text) return '<p>No content available</p>';
     
-    // First, split by double newlines to get paragraphs
+    // First split by double newlines to get paragraphs
     let paragraphs = text.split(/\n\s*\n/);
     let inList = false;
     let output = '';
@@ -426,6 +427,7 @@ function formatPostContent(text) {
                 output += '</ul>';
                 inList = false;
             }
+            // Replace single newlines with <br> except after headings or lists
             output += `<p>${para.replace(/\n/g, '<br>')}</p>`;
         }
     });
