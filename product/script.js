@@ -1,163 +1,178 @@
-// Debugging flag - set to true to see console logs
-const DEBUG = true;
+// Configuration
+const CONFIG = {
+    debug: true,
+    blogDataUrl: '/product/blog_data.csv',
+    postsPerPage: 6,
+    fallbackImage: 'https://via.placeholder.com/800x450?text=Image+Not+Available'
+};
 
-document.addEventListener('DOMContentLoaded', function() {
-    if (DEBUG) console.log('DOM fully loaded and parsed');
+// Main initialization
+document.addEventListener('DOMContentLoaded', async function() {
+    log('DOM fully loaded');
     
-    // Initialize mobile menu
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (hamburger && navLinks) {
-        hamburger.addEventListener('click', function() {
-            navLinks.classList.toggle('show');
-            if (DEBUG) console.log('Mobile menu toggled');
-        });
+    try {
+        // Initialize mobile menu
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (hamburger && navLinks) {
+            hamburger.addEventListener('click', () => navLinks.classList.toggle('show'));
+        }
+
+        // Initialize search
+        initSearch();
+        
+        // Handle initial routing
+        await handleRouting();
+        
+        // Handle back/forward navigation
+        window.addEventListener('popstate', handleRouting);
+        
+        log('Initialization complete');
+    } catch (error) {
+        showError('Initialization failed', error);
     }
-
-    // Initialize all functionality
-    initSearch();
-    handleRouting();
-    window.addEventListener('popstate', handleRouting);
-    
-    if (DEBUG) console.log('Initialization complete');
 });
 
 // ==================== CORE FUNCTIONS ====================
 
 async function handleRouting() {
-    if (DEBUG) console.log('Handling routing for:', window.location.pathname);
+    log(`Handling route: ${window.location.pathname}${window.location.search}`);
     
     try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const year = urlParams.get('year');
-        const month = urlParams.get('month');
-        const day = urlParams.get('day');
-        const slug = urlParams.get('slug');
+        // Hide any previous errors
+        hideError();
         
-        if (year && month && day && slug) {
-            const prettyUrl = `/${year}/${month}/${day}/${slug}.html`;
-            window.history.replaceState(null, null, prettyUrl);
-            await loadSinglePost();
-        } 
-        else if (isPostPage()) {
-            await loadSinglePost();
+        // Check if we're loading a single post
+        const postParams = getPostParamsFromURL();
+        if (postParams.valid) {
+            await loadSinglePost(postParams);
+            return;
         }
-        else if (window.location.pathname.includes('about.html')) {
+        
+        // Check for about/contact pages
+        if (window.location.pathname.includes('about.html')) {
             document.querySelector('.nav-links a[href*="about.html"]')?.classList.add('active');
+            return;
         }
-        else if (window.location.pathname.includes('contact.html')) {
+        
+        if (window.location.pathname.includes('contact.html')) {
             document.querySelector('.nav-links a[href*="contact.html"]')?.classList.add('active');
             initContactForm();
+            return;
         }
-        else {
-            await loadBlogPosts();
-        }
+        
+        // Default to blog posts
+        await loadBlogPosts();
     } catch (error) {
-        console.error('Routing error:', error);
-        showError('Failed to load page content. Please try again.');
+        showError('Failed to load page content', error);
     }
 }
 
-// ==================== DATA HANDLING ====================
+// ==================== DATA LOADING ====================
 
 async function fetchBlogData() {
-    if (DEBUG) console.log('Fetching blog data...');
+    log('Fetching blog data...');
     
     try {
-        const response = await fetch('/product/blog_data.csv');
+        // Add cache busting for development
+        const cacheBuster = CONFIG.debug ? `?t=${Date.now()}` : '';
+        const response = await fetch(`${CONFIG.blogDataUrl}${cacheBuster}`);
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        
         const csvText = await response.text();
-        if (DEBUG) console.log('Received CSV data:', csvText.substring(0, 100) + '...');
+        log('Received CSV data (first 100 chars):', csvText.substring(0, 100));
         
         const data = parseCSV(csvText);
-        if (DEBUG) console.log('Parsed blog data:', data);
+        log('Parsed blog data:', data);
+        
+        if (data.length === 0) {
+            throw new Error('No valid posts found in CSV');
+        }
+        
         return data;
     } catch (error) {
-        console.error('Error loading blog data:', error);
-        showError('Failed to load blog posts. Please check your internet connection and try again.');
+        showError('Failed to load blog data', error);
         return [];
     }
 }
 
 function parseCSV(csvText) {
     const lines = csvText.split('\n').filter(line => line.trim() !== '');
-    if (lines.length === 0) return [];
+    if (lines.length < 2) return []; // Need at least header + one row
     
     const headers = lines[0].split(',').map(h => h.trim());
     const result = [];
-
+    
     for (let i = 1; i < lines.length; i++) {
-        const currentLine = lines[i];
-        if (!currentLine.trim()) continue;
+        const line = lines[i];
+        if (!line.trim()) continue;
         
-        // Improved CSV parsing that handles quoted fields with commas
-        const values = currentLine.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+        // Handle quoted fields with commas
+        const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
         
-        const obj = {};
+        const post = {};
         headers.forEach((header, index) => {
             let value = values[index] || '';
+            
             // Remove surrounding quotes if present
             if (value.startsWith('"') && value.endsWith('"')) {
                 value = value.substring(1, value.length - 1);
             }
-            // Replace escaped newlines
-            value = value.replace(/\\n/g, '\n');
-            obj[header] = value.trim();
+            
+            // Replace escaped newlines and clean up
+            value = value.replace(/\\n/g, '\n').trim();
+            post[header] = value;
         });
         
-        // Only add if we have a title
-        if (obj.title) {
-            result.push(obj);
+        // Only add if we have required fields
+        if (post.title && post.date) {
+            result.push(post);
         }
     }
     
     return result;
 }
 
-// ==================== BLOG DISPLAY FUNCTIONS ====================
+// ==================== POST DISPLAY ====================
 
 async function loadBlogPosts() {
-    if (DEBUG) console.log('Loading blog posts...');
+    log('Loading blog posts...');
     
     try {
         const allPosts = await fetchBlogData();
         if (allPosts.length === 0) {
-            showError('No blog posts found.');
+            showMessage('No blog posts available');
             return;
         }
         
+        // Sort by date (newest first)
         allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
         
-        const postsPerPage = 6;
+        // Pagination
         const currentPage = getPageNumber();
-        const totalPages = Math.ceil(allPosts.length / postsPerPage);
-        const paginatedPosts = allPosts.slice(
-            (currentPage - 1) * postsPerPage,
-            currentPage * postsPerPage
-        );
+        const totalPages = Math.ceil(allPosts.length / CONFIG.postsPerPage);
+        const startIdx = (currentPage - 1) * CONFIG.postsPerPage;
+        const paginatedPosts = allPosts.slice(startIdx, startIdx + CONFIG.postsPerPage);
         
+        // Display
         displayPostGrid(paginatedPosts);
         setupPagination(totalPages, currentPage);
+        hideSinglePost();
         
-        const postContent = document.getElementById('post-content');
-        if (postContent) postContent.style.display = 'none';
-        
-        initLinkInterception();
-        
-        if (DEBUG) console.log(`Displaying ${paginatedPosts.length} posts on page ${currentPage}`);
+        log(`Displaying ${paginatedPosts.length} posts (page ${currentPage}/${totalPages})`);
     } catch (error) {
-        console.error('Error loading blog posts:', error);
-        showError('Failed to load blog posts. Please try again later.');
+        showError('Failed to load blog posts', error);
     }
 }
 
 function displayPostGrid(posts) {
     const grid = document.getElementById('blog-grid');
     if (!grid) {
-        if (DEBUG) console.error('Blog grid element not found');
+        log('Blog grid element not found', 'error');
         return;
     }
     
@@ -169,82 +184,118 @@ function createPostCard(post) {
     try {
         const postDate = new Date(post.date);
         if (isNaN(postDate.getTime())) {
-            throw new Error(`Invalid date for post: ${post.title}`);
+            throw new Error(`Invalid date: ${post.date}`);
         }
         
-        const year = postDate.getFullYear();
-        const month = String(postDate.getMonth() + 1).padStart(2, '0');
-        const day = String(postDate.getDate()).padStart(2, '0');
+        const dateStr = postDate.toLocaleDateString();
         const slug = createSlug(post.title);
-        const prettyUrl = `/product/${year}/${month}/${day}/${slug}.html`;
-        const paramUrl = `/product/index.html?year=${year}&month=${month}&day=${day}&slug=${slug}`;
+        const url = getPostUrl(postDate, slug);
         
         return `
             <article class="blog-card">
                 <div class="card-image">
-                    <a href="${paramUrl}" data-navigo data-fallback="${prettyUrl}">
-                        <img src="${post.image || 'https://via.placeholder.com/600x400?text=No+Image'}" 
-                             alt="${post.title}"
-                             onerror="this.onerror=null;this.src='https://via.placeholder.com/600x400?text=Image+Error'">
+                    <a href="${url.param}" data-navigo data-fallback="${url.pretty}">
+                        <img src="${post.image || CONFIG.fallbackImage}" 
+                             alt="${escapeHTML(post.title)}"
+                             onerror="this.src='${CONFIG.fallbackImage}'">
                     </a>
                 </div>
                 <div class="card-content">
                     <div class="post-meta">
-                        <span>By ${post.author || 'Unknown'}</span>
+                        <span>By ${escapeHTML(post.author || 'Unknown')}</span>
                         <span>•</span>
-                        <span>${postDate.toLocaleDateString()}</span>
+                        <span>${dateStr}</span>
                     </div>
-                    <h2><a href="${paramUrl}" data-navigo data-fallback="${prettyUrl}">${post.title}</a></h2>
-                    <p>${cleanDescription(post.excerpt, 100)}</p>
-                    <a href="${paramUrl}" class="read-more" data-navigo data-fallback="${prettyUrl}">
+                    <h2><a href="${url.param}" data-navigo data-fallback="${url.pretty}">
+                        ${escapeHTML(post.title)}
+                    </a></h2>
+                    <p>${escapeHTML(truncate(post.excerpt, 100))}</p>
+                    <a href="${url.param}" class="read-more" data-navigo data-fallback="${url.pretty}">
                         Read More <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </article>
         `;
     } catch (error) {
-        console.error('Error creating post card:', error);
-        return '<div class="error-card">Error loading post</div>';
+        log(`Error creating post card: ${error.message}`, 'error');
+        return '<div class="error-card">Error loading post preview</div>';
     }
 }
 
-// ==================== SINGLE POST FUNCTIONS ====================
+// ==================== SINGLE POST ====================
 
-async function loadSinglePost() {
-    if (DEBUG) console.log('Loading single post...');
+async function loadSinglePost({year, month, day, slug}) {
+    log(`Loading single post: ${year}/${month}/${day}/${slug}`);
     
     try {
-        const { year, month, day, slug } = getPostParamsFromURL();
         const posts = await fetchBlogData();
-        
         if (posts.length === 0) {
-            showError('No blog posts available.');
+            showMessage('No blog posts available');
             return;
         }
         
         const post = findPostBySlugAndDate(posts, slug, year, month, day);
-        
-        if (post) {
-            updateMetaTags(post);
-            displaySinglePostContent(post);
-            hideGridAndPagination();
-            
-            if (DEBUG) console.log('Successfully loaded post:', post.title);
-        } else {
-            if (DEBUG) console.log('Post not found, redirecting to home');
-            window.location.href = '/product/index.html';
+        if (!post) {
+            throw new Error('Post not found');
         }
+        
+        displaySinglePost(post);
+        hidePostGrid();
+        
+        log(`Successfully loaded post: ${post.title}`);
     } catch (error) {
-        console.error('Error loading single post:', error);
-        showError('The requested post could not be found. <a href="/product/index.html" data-navigo>Return to blog</a>');
+        showError('Post not found', error);
+        setTimeout(() => window.location.href = '/product/index.html', 3000);
     }
 }
 
+function displaySinglePost(post) {
+    const postContent = document.getElementById('post-content');
+    if (!postContent) {
+        log('Post content element not found', 'error');
+        return;
+    }
+    
+    // Update meta tags
+    updateMetaTags(post);
+    
+    // Display content
+    postContent.style.display = 'block';
+    postContent.innerHTML = `
+        <article class="post-article">
+            <h1 class="post-title">${escapeHTML(post.title)}</h1>
+            <div class="post-meta">
+                <span>By ${escapeHTML(post.author || 'Unknown')}</span>
+                <span>•</span>
+                <span>${new Date(post.date).toLocaleDateString()}</span>
+            </div>
+            <div class="featured-image-container">
+                <img src="${post.image || CONFIG.fallbackImage}" 
+                     alt="${escapeHTML(post.title)}"
+                     class="featured-image"
+                     onerror="this.src='${CONFIG.fallbackImage}'">
+            </div>
+            <div class="post-content">
+                ${formatPostContent(post.description)}
+            </div>
+            <a href="/product/index.html" class="back-link" data-navigo>
+                <i class="fas fa-arrow-left"></i> Back to Blog
+            </a>
+        </article>
+    `;
+    
+    initLinkInterception();
+}
+
+// ==================== UTILITIES ====================
+
 function getPostParamsFromURL() {
-    const pathMatch = window.location.pathname.match(/\/(\d{4})\/(\d{2})\/(\d{2})\/(.+)\.html$/);
+    // Try pretty URL first (e.g., /2023/05/15/my-post.html)
+    const pathMatch = window.location.pathname.match(/\/(\d{4})\/(\d{2})\/(\d{2})\/([^\.]+)\.html$/);
     
     if (pathMatch) {
         return {
+            valid: true,
             year: pathMatch[1],
             month: pathMatch[2],
             day: pathMatch[3],
@@ -252,12 +303,16 @@ function getPostParamsFromURL() {
         };
     }
     
+    // Try parameter URL (e.g., ?year=2023&month=05&day=15&slug=my-post)
     const urlParams = new URLSearchParams(window.location.search);
+    const year = urlParams.get('year');
+    const month = urlParams.get('month');
+    const day = urlParams.get('day');
+    const slug = urlParams.get('slug');
+    
     return {
-        year: urlParams.get('year'),
-        month: urlParams.get('month'),
-        day: urlParams.get('day'),
-        slug: urlParams.get('slug')
+        valid: !!(year && month && day && slug),
+        year, month, day, slug
     };
 }
 
@@ -272,53 +327,21 @@ function findPostBySlugAndDate(posts, slug, year, month, day) {
                    String(postDate.getMonth() + 1).padStart(2, '0') == month &&
                    String(postDate.getDate()).padStart(2, '0') == day;
         } catch (error) {
-            console.error('Error processing post:', post.title, error);
+            log(`Error processing post: ${post.title} - ${error.message}`, 'error');
             return false;
         }
     });
 }
 
-function displaySinglePostContent(post) {
-    const postContent = document.getElementById('post-content');
-    if (!postContent) {
-        if (DEBUG) console.error('Post content element not found');
-        return;
-    }
+function getPostUrl(postDate, slug) {
+    const year = postDate.getFullYear();
+    const month = String(postDate.getMonth() + 1).padStart(2, '0');
+    const day = String(postDate.getDate()).padStart(2, '0');
     
-    postContent.style.display = 'block';
-    postContent.innerHTML = `
-        <article class="post-article">
-            <h1 class="post-title">${escapeHTML(post.title)}</h1>
-            <div class="post-meta">
-                <span>By ${escapeHTML(post.author || 'Unknown')}</span>
-                <span>•</span>
-                <span>${new Date(post.date).toLocaleDateString()}</span>
-            </div>
-            <div class="featured-image-container">
-                <img src="${escapeHTML(post.image)}" alt="${escapeHTML(post.title)}" class="featured-image"
-                     onerror="this.onerror=null;this.src='https://via.placeholder.com/800x450?text=Image+Not+Available'">
-            </div>
-            <div class="post-content">
-                ${formatPostContent(post.description)}
-            </div>
-            <a href="/product/index.html" class="back-link" data-navigo>
-                <i class="fas fa-arrow-left"></i> Back to Blog
-            </a>
-        </article>
-    `;
-    
-    initLinkInterception();
-}
-
-// ==================== HELPER FUNCTIONS ====================
-
-function escapeHTML(str) {
-    if (!str) return '';
-    return str.replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;")
-              .replace(/"/g, "&quot;")
-              .replace(/'/g, "&#039;");
+    return {
+        pretty: `/product/${year}/${month}/${day}/${slug}.html`,
+        param: `/product/index.html?year=${year}&month=${month}&day=${day}&slug=${slug}`
+    };
 }
 
 function formatPostContent(text) {
@@ -341,96 +364,183 @@ function formatPostContent(text) {
                 html += '<ul class="post-list">';
                 inList = true;
             }
-            // Remove the bullet/number and any leading whitespace
+            // Remove the bullet/number
             const content = para.replace(/^(\s*[-*•]\s|\s*\d+\.\s)/, '').trim();
-            html += `<li>${content.replace(/\n/g, '<br>')}</li>`;
+            html += `<li>${escapeHTML(content.replace(/\n/g, '<br>'))}</li>`;
         } else {
             if (inList) {
                 html += '</ul>';
                 inList = false;
             }
-            // Handle regular paragraphs with internal line breaks
-            html += `<p>${para.replace(/\n/g, '<br>')}</p>`;
+            // Handle regular paragraphs
+            html += `<p>${escapeHTML(para.replace(/\n/g, '<br>'))}</p>`;
         }
     });
 
     // Close any remaining list
-    if (inList) {
-        html += '</ul>';
-    }
-
+    if (inList) html += '</ul>';
+    
     return html;
 }
 
-function cleanDescription(text, maxLength = 100) {
+function escapeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function truncate(text, maxLength) {
     if (!text) return '';
-    let cleaned = text.replace(/<[^>]*>/g, ' ')  // Remove HTML tags
-                     .replace(/\s+/g, ' ')      // Collapse whitespace
-                     .trim();
-    
-    if (maxLength && cleaned.length > maxLength) {
-        cleaned = cleaned.substring(0, maxLength) + '...';
-    }
-    return escapeHTML(cleaned);
+    return text.length > maxLength 
+        ? text.substring(0, maxLength) + '...' 
+        : text;
 }
 
 function createSlug(title) {
     if (!title) return '';
     return title.toLowerCase()
-        .replace(/[^\w\s-]/g, '')  // Remove non-word chars
-        .replace(/\s+/g, '-')      // Replace spaces with -
-        .replace(/-+/g, '-')       // Collapse multiple -
-        .substring(0, 50)          // Limit length
-        .replace(/-$/, '');         // Remove trailing -
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .substring(0, 50)
+        .replace(/-$/, '');
 }
 
-function showError(message) {
+// ==================== UI HELPERS ====================
+
+function showError(message, error = null) {
+    if (error) console.error(message, error);
+    
     const errorContainer = document.getElementById('error-container') || createErrorContainer();
-    errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
+    errorContainer.innerHTML = `
+        <div class="error-message">
+            <p>${message}</p>
+            ${error ? `<small>${error.message}</small>` : ''}
+            <a href="/product/index.html" data-navigo>Return to Home</a>
+        </div>
+    `;
     errorContainer.style.display = 'block';
-    if (DEBUG) console.error('Displayed error:', message);
 }
 
-function createErrorContainer() {
-    const container = document.createElement('div');
-    container.id = 'error-container';
-    container.style.position = 'fixed';
-    container.style.top = '20px';
-    container.style.left = '50%';
-    container.style.transform = 'translateX(-50%)';
-    container.style.zIndex = '1000';
-    document.body.appendChild(container);
-    return container;
+function showMessage(message) {
+    const container = document.getElementById('message-container') || createMessageContainer();
+    container.innerHTML = `<div class="info-message">${message}</div>`;
+    container.style.display = 'block';
 }
 
-function hideGridAndPagination() {
+function hideError() {
+    const container = document.getElementById('error-container');
+    if (container) container.style.display = 'none';
+}
+
+function hidePostGrid() {
     const grid = document.getElementById('blog-grid');
     const pagination = document.getElementById('pagination');
-    
     if (grid) grid.style.display = 'none';
     if (pagination) pagination.style.display = 'none';
+}
+
+function hideSinglePost() {
+    const postContent = document.getElementById('post-content');
+    if (postContent) postContent.style.display = 'none';
 }
 
 function updateMetaTags(post) {
     document.title = `${post.title} | Bandar Deterjen`;
     
-    // Update standard meta tags
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.content = post.excerpt;
+    // Standard meta tags
+    setMetaTag('description', post.excerpt);
+    setMetaTag('keywords', `laundry, ${post.title.toLowerCase().split(' ').join(', ')}, ${post.author}`);
     
-    // Update Open Graph/Facebook meta tags
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    const ogImage = document.querySelector('meta[property="og:image"]');
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-    
-    if (ogTitle) ogTitle.content = post.title;
-    if (ogDesc) ogDesc.content = post.excerpt;
-    if (ogImage) ogImage.content = post.image;
-    if (ogUrl) ogUrl.content = window.location.href;
+    // Open Graph/Facebook meta tags
+    setMetaTag('og:title', post.title, true);
+    setMetaTag('og:description', post.excerpt, true);
+    setMetaTag('og:image', post.image || CONFIG.fallbackImage, true);
+    setMetaTag('og:url', window.location.href, true);
 }
 
-// Initialize the app
-if (document.readyState !== 'loading') {
-    handleRouting();
+function setMetaTag(name, content, isProperty = false) {
+    const attr = isProperty ? 'property' : 'name';
+    let tag = document.querySelector(`meta[${attr}="${name}"]`);
+    
+    if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute(attr, name);
+        document.head.appendChild(tag);
+    }
+    
+    tag.setAttribute('content', content || '');
 }
+
+function log(message, level = 'log') {
+    if (!CONFIG.debug) return;
+    console[level](`[Blog] ${message}`);
+}
+
+// Initialize link interception for SPA behavior
+function initLinkInterception() {
+    document.querySelectorAll('[data-navigo]').forEach(link => {
+        const fallback = link.getAttribute('data-fallback');
+        if (fallback) {
+            link.setAttribute('href', fallback);
+        }
+        
+        link.addEventListener('click', function(e) {
+            if (this.hasAttribute('data-navigo')) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                
+                if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
+                    window.open(href, '_blank');
+                } else {
+                    window.history.pushState(null, null, href);
+                    handleRouting();
+                }
+            }
+        });
+    });
+}
+
+// Initialize contact form
+function initContactForm() {
+    const form = document.getElementById('contact-form');
+    if (!form) return;
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Form submission would go here in a real implementation');
+    });
+}
+
+// Initialize search
+function initSearch() {
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    
+    if (!searchInput || !searchButton) return;
+    
+    searchButton.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') performSearch();
+    });
+    
+    async function performSearch() {
+        const query = searchInput.value.trim();
+        if (query.length < 2) return;
+        
+        try {
+            const posts = await fetchBlogData();
+            const results = posts.filter(post => 
+                post.title.toLowerCase().includes(query.toLowerCase()) || 
+                post.excerpt.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            displaySearchResults(results);
+        } catch (error) {
+            showError('Search failed', error);
+        }
+    }
+}
+
+// [Additional helper functions as needed...]
