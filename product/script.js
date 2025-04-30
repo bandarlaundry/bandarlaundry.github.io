@@ -391,53 +391,75 @@ async function loadSinglePost() {
     }
 }
 
-// Format post content with proper HTML
+// Updated formatPostContent function
 function formatPostContent(text) {
     if (!text) return '<p>No content available</p>';
     
-    // First split by double newlines to get paragraphs
-    let paragraphs = text.split(/\n\s*\n/);
+    // Normalize line endings and split into paragraphs
+    const paragraphs = text.replace(/\r\n/g, '\n').split(/\n\n+/);
+    let htmlOutput = '';
     let inList = false;
-    let output = '';
-    
+
     paragraphs.forEach(para => {
-        if (!para.trim()) return;
-        
-        // Check if this paragraph starts a list
-        const isListItem = /^(\s*[\-*•]\s+|\s*\d+\.\s+)/.test(para);
-        
-        if (isListItem && !inList) {
-            // Start a new list
-            output += '<ul>';
-            inList = true;
-        } else if (!isListItem && inList) {
-            // Close the previous list
-            output += '</ul>';
-            inList = false;
-        }
-        
-        // Process the paragraph content
+        para = para.trim();
+        if (!para) return;
+
+        // Check for list items
+        const isUnorderedListItem = /^[-*•]\s/.test(para);
+        const isOrderedListItem = /^\d+\.\s/.test(para);
+        const isListItem = isUnorderedListItem || isOrderedListItem;
+
         if (isListItem) {
-            // It's a list item - replace bullet/number with <li>
-            para = para.replace(/^(\s*[\-*•]\s+|\s*\d+\.\s+)/, '');
-            output += `<li>${para.replace(/\n/g, '<br>')}</li>`;
+            if (!inList) {
+                htmlOutput += '<ul>';
+                inList = true;
+            }
+            // Remove the bullet/number
+            const content = para.replace(/^[-*•]\s|^\d+\.\s/, '');
+            htmlOutput += `<li>${content.replace(/\n/g, '<br>')}</li>`;
         } else {
-            // It's a regular paragraph
             if (inList) {
-                output += '</ul>';
+                htmlOutput += '</ul>';
                 inList = false;
             }
-            // Replace single newlines with <br> except after headings or lists
-            output += `<p>${para.replace(/\n/g, '<br>')}</p>`;
+            // Handle paragraphs with internal line breaks
+            htmlOutput += `<p>${para.replace(/\n/g, '<br>')}</p>`;
         }
     });
-    
-    // Close any remaining open list
+
+    // Close any remaining list
     if (inList) {
-        output += '</ul>';
+        htmlOutput += '</ul>';
     }
-    
-    return output;
+
+    return htmlOutput;
+}
+
+// Updated CSV parsing function
+function parseCSV(csvText) {
+    const lines = csvText.split('\n');
+    const headers = lines[0].split(',');
+    const result = [];
+
+    for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        
+        const obj = {};
+        let currentline = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+        
+        for (let j = 0; j < headers.length; j++) {
+            let value = currentline[j] || '';
+            // Remove surrounding quotes if present
+            if (value.startsWith('"') && value.endsWith('"')) {
+                value = value.substring(1, value.length - 1);
+            }
+            // Replace escaped newlines with actual newlines
+            value = value.replace(/\\n/g, '\n');
+            obj[headers[j]] = value;
+        }
+        result.push(obj);
+    }
+    return result;
 }
 
 // Initialize link interception for SPA behavior
