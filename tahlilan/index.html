@@ -30,19 +30,49 @@ const script = document.createElement('script');
 script.src = 'https://www.geocities.ws/wahyudi/tool/tahlilan/script.js';
 document.body.appendChild(script);
  
-    javascript:(function () {
+   javascript:(function () {
+  // List of allowed URLs
   const allowedUrls = [
     'https://www.geocities.ws/wahyudi',
     'https://kelasmaster.github.io/'
   ];
+
+  // Get current URL
   const currentUrl = window.location.href;
 
+  // Check if current URL is allowed
   if (!allowedUrls.some(url => currentUrl.startsWith(url))) {
     alert('❌ This script only works on allowed URLs!');
     return;
   }
 
-  setTimeout(() => div.remove(), 3000); // Remove after 3 seconds
+  // Clear the page content
+  document.body.innerHTML = `
+    <div style="
+      text-align: center;
+      margin-top: 20%;
+      font-family: Arial, sans-serif;
+      color: #333;
+    ">
+      Redirecting to WhatsApp...
+    </div>
+  `;
+
+  // Show confirmation alert
+  const shouldRedirect = confirm('Click OK to contact support via WhatsApp.');
+
+  // WhatsApp number and message
+  const phoneNumber = '6285773009666';
+  const message = encodeURIComponent('Saya Perlu Bantuan');
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+
+  // Redirect to WhatsApp if OK is clicked
+  if (shouldRedirect) {
+    window.location.href = whatsappUrl;
+  } else {
+    // Optional: reload the page if Cancel is clicked
+    window.location.reload();
+  }
 })();
   </script>
 </body>
