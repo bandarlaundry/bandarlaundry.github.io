@@ -17,44 +17,57 @@
     }
   </style>
   <script>
-    (function () {
-      // Allowed URLs (you can add more)
-      const allowedUrls = [
-        'https://www.geocities.ws/wahyudi',
-        'https://kelasmaster.github.io/'
-      ];
+    (async function () {
+      try {
+        // Load allowed URLs from CSV
+        const response = await fetch('https://kelasmaster.github.io/protected-page/allowed-url.csv');
+        const text = await response.text();
+        const allowedUrls = text
+          .split('\n')
+          .map(url => url.trim())
+          .filter(url => url.length > 0); // Remove empty lines
 
-      // Get current URL
-      const currentUrl = window.location.href;
+        // Get current URL
+        const currentUrl = window.location.href;
 
-      // Check if current URL is allowed
-      const isAllowed = allowedUrls.some(url => currentUrl.startsWith(url));
+        // Check if current URL matches any allowed URL
+        const isAllowed = allowedUrls.some(url => currentUrl.startsWith(url));
 
-      if (!isAllowed) {
-        // Block unauthorized access
+        if (!isAllowed) {
+          // Block unauthorized access
+          document.documentElement.innerHTML = `
+            <body class="protected whatsapp-redirect">
+              <h2>⚠️ Access Denied</h2>
+              <p>This content is protected and can only be viewed on authorized domains.</p>
+              <p>Redirecting to WhatsApp in <span id="countdown">5</span> seconds...</p>
+            </body>
+          `;
+
+          // Countdown logic
+          let timeLeft = 5;
+          const countdown = document.getElementById('countdown');
+
+          const timer = setInterval(() => {
+            timeLeft--;
+            if (countdown) countdown.textContent = timeLeft;
+            if (timeLeft <= 0) {
+              clearInterval(timer);
+              const phoneNumber = '6285773009666';
+              const message = encodeURIComponent('Saya Perlu Bantuan');
+              const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+              window.location.href = whatsappUrl;
+            }
+          }, 1000);
+        }
+      } catch (error) {
+        // Handle error (e.g., CSV file not found)
         document.documentElement.innerHTML = `
-          <body class="protected whatsapp-redirect">
-            <h2>⚠️ Access Denied</h2>
-            <p>This content is protected and can only be viewed on authorized domains.</p>
-            <p>Redirecting to WhatsApp in <span id="countdown">5</span> seconds...</p>
+          <body class="protected">
+            <h2>⚠️ Error Loading Content</h2>
+            <p>Unable to verify access permissions. Please try again later.</p>
           </body>
         `;
-
-        // Countdown logic
-        let timeLeft = 5;
-        const countdown = document.getElementById('countdown');
-
-        const timer = setInterval(() => {
-          timeLeft--;
-          if (countdown) countdown.textContent = timeLeft;
-          if (timeLeft <= 0) {
-            clearInterval(timer);
-            const phoneNumber = '6285773009666';
-            const message = encodeURIComponent('Saya Perlu Bantuan');
-            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
-            window.location.href = whatsappUrl;
-          }
-        }, 1000);
+        console.error("Error fetching allowed URLs:", error);
       }
     })();
   </script>
