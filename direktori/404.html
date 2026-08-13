@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title id="seo-title">Memuat Detail Usaha... — Laundry Directory V2.0</title>
+  <meta id="seo-desc" name="description" content="Lihat alamat lengkap, nomor WhatsApp, lokasi peta, dan layanan usaha kebersihan.">
+  <link id="seo-canonical" rel="canonical" href="" />
+
+  <meta property="og:type" content="business.business" />
+  <meta property="og:site_name" content="Laundry Directory V2.0" />
+  <meta id="og-title" property="og:title" content="Memuat Detail Usaha..." />
+  <meta id="og-desc" property="og:description" content="Informasi detail layanan laundry dan kebersihan." />
+  <meta id="og-url" property="og:url" content="" />
+  <meta id="og-image" property="og:image" content="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=1200&auto=format&fit=crop&q=80" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="./style.css" />
+
+  <script id="json-ld-schema" type="application/ld+json"></script>
+</head>
+<body>
+
+  <header>
+    <h1><a href="/directoryv2/">← Laundry Directory V2.0</a></h1>
+    <div class="header-actions">
+      <button class="btn btn-dark" id="dark-mode-toggle">🌙 Mode Gelap</button>
+    </div>
+  </header>
+
+  <!-- SLOT IKLAN HALAMAN DETAIL: SETELAH HEADER -->
+  <div id="ad-slot-detail-top" class="ad-slot-container"></div>
+
+  <main class="container">
+    <article class="card" id="content">
+      <div style="text-align: center; padding: 2rem; color: #64748b;">Memuat informasi usaha...</div>
+    </article>
+  </main>
+
+  <!-- SLOT IKLAN HALAMAN DETAIL: SEBELUM FOOTER -->
+  <div id="ad-slot-detail-bottom" class="ad-slot-container"></div>
+
+  <footer>
+    <div class="footer-container">
+      <div>&copy; <span id="current-year"></span> Laundry Directory V2.0. Hak Cipta Dilindungi.</div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
