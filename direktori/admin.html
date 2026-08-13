@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Laundry Directory V2.0</title>
+  <link rel="stylesheet" href="./style.css" />
+  <style>
+    .admin-cards-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
+    .admin-item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .admin-item-header { display: flex; justify-content: space-between; align-items: center; }
+    .admin-item-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Admin Panel V2.0</h1>
+    <div class="header-actions">
+      <a href="./" class="btn btn-secondary">🌐 Ke Utama</a>
+      <button id="logout-btn" class="btn btn-danger">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- 1. MANAJEMEN IKLAN BANNER (KHUSUS ADMIN) -->
+    <section class="section-box" style="background:var(--surface); padding:1.2rem; border-radius:8px; border:1px solid var(--border); margin-bottom:1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <h2>Manajemen Iklan Banner</h2>
+        <button id="open-ad-modal-btn" class="btn btn-primary">+ Tambah Iklan Baru</button>
+      </div>
+      <div id="ads-cards-wrapper" class="admin-cards-list">Memuat data iklan...</div>
+    </section>
+
+    <!-- 2. MANAJEMEN USER -->
+    <section class="section-box" style="background:var(--surface); padding:1.2rem; border-radius:8px; border:1px solid var(--border); margin-bottom:1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <h2>Manajemen User / Owner</h2>
+        <button id="open-user-modal-btn" class="btn btn-primary">+ Tambah User Manual</button>
+      </div>
+      <div id="user-cards-wrapper" class="admin-cards-list">Memuat data user...</div>
+    </section>
+
+    <!-- 3. MODERASI USAHA -->
+    <section class="section-box" style="background:var(--surface); padding:1.2rem; border-radius:8px; border:1px solid var(--border); margin-bottom:1.5rem;">
+      <h2>Moderasi Usaha & Listing</h2>
+      <div id="business-cards-wrapper" class="admin-cards-list">Memuat data usaha...</div>
+      
+      <div class="pagination" id="b-pagination" style="display:none;">
+        <button class="page-btn" id="bp-first">&lt;&lt;</button>
+        <button class="page-btn" id="bp-prev">&lt;</button>
+        <div id="bp-numbers" style="display:flex; gap:0.3rem;"></div>
+        <button class="page-btn" id="bp-next">&gt;</button>
+        <button class="page-btn" id="bp-last">&gt;&gt;</button>
+      </div>
+    </section>
+
+    <!-- 4. KELOLA GALERI -->
+    <section class="section-box" style="background:var(--surface); padding:1.2rem; border-radius:8px; border:1px solid var(--border); margin-bottom:1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <h2>Kelola Galeri Thumbnail Random Admin</h2>
+        <button id="open-gallery-modal-btn" class="btn btn-primary">+ Tambah Image URL Galeri</button>
+      </div>
+      <div id="gallery-grid-wrapper" class="gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:0.8rem; margin-top:1rem;">Memuat galeri...</div>
+      
+      <div class="pagination" id="g-pagination" style="display:none;">
+        <button class="page-btn" id="gp-first">&lt;&lt;</button>
+        <button class="page-btn" id="gp-prev">&lt;</button>
+        <div id="gp-numbers" style="display:flex; gap:0.3rem;"></div>
+        <button class="page-btn" id="gp-next">&gt;</button>
+        <button class="page-btn" id="gp-last">&gt;&gt;</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-container">
+      <div>Dashboard Admin Laundry Directory V2.0</div>
+      <div>&copy; <span id="current-year"></span> Hak Cipta Dilindungi.</div>
+    </div>
+  </footer>
+
+  <!-- MODAL FORM TAMBAH/EDIT IKLAN -->
+  <div class="modal" id="ad-modal">
+    <div class="modal-content">
+      <h2 style="color:var(--primary); margin-bottom:1rem;" id="ad-modal-title">Tambah Iklan Baru</h2>
+      <form id="add-ad-form">
+        <input type="hidden" id="ad-id">
+        <div class="form-group">
+          <label>URL Gambar Banner Iklan (Mobile-Friendly)</label>
+          <input type="url" id="ad-image-url" required placeholder="https://images.unsplash.com/photo-...">
+        </div>
+        <div class="form-group">
+          <label>URL Link Tujuan Saat Klik Iklan</label>
+          <input type="url" id="ad-target-url" required placeholder="https://wa.me/6285712345678 atau https://website.com">
+        </div>
+        <div class="form-group">
+          <label>Penempatan Iklan</label>
+          <select id="ad-placement" required>
+            <option value="main_top">Halaman Utama - Setelah Header</option>
+            <option value="main_bottom">Halaman Utama - Sebelum Footer</option>
+            <option value="detail_top">Halaman Detail - Setelah Header</option>
+            <option value="detail_bottom">Halaman Detail - Sebelum Footer</option>
+          </select>
+        </div>
+
+        <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+          <button type="submit" class="btn btn-primary" style="flex:1;">Simpan Iklan</button>
+          <button type="button" class="btn btn-secondary" id="close-ad-modal-btn">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL TAMBAH USER -->
+  <div class="modal" id="user-modal">
+    <div class="modal-content">
+      <h2 style="color:var(--primary); margin-bottom:1rem;">Tambah User Manual</h2>
+      <form id="add-user-form">
+        <div class="form-group"><label>Nama Owner</label><input type="text" id="u-name" required placeholder="Budi Pratama"></div>
+        <div class="form-group"><label>Nomor WhatsApp</label><input type="text" id="u-phone" required placeholder="085712345678"></div>
+        <div class="form-group"><label>Email Owner</label><input type="email" id="u-email" required placeholder="budi@gmail.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="u-password" required minlength="6"></div>
+
+        <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+          <button type="submit" class="btn btn-primary" style="flex:1;">Simpan User</button>
+          <button type="button" class="btn btn-secondary" id="close-user-modal-btn">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL TAMBAH GALERI -->
+  <div class="modal" id="gallery-modal">
+    <div class="modal-content">
+      <h2 style="color:var(--primary); margin-bottom:1rem;">Tambah URL Gambar Galeri</h2>
+      <form id="add-gallery-form">
+        <div class="form-group">
+          <label>URL Gambar Baru</label>
+          <input type="url" id="g-url" required placeholder="https://images.unsplash.com/photo-...">
+        </div>
+
+        <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+          <button type="submit" class="btn btn-primary" style="flex:1;">Simpan Gambar</button>
+          <button type="button" class="btn btn-secondary" id="close-gallery-modal-btn">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
