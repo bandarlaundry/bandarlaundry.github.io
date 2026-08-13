@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Laundry Directory — Cari Laundry, Cuci Sepatu & Cleaning Terdekat</title>
+  <meta name="description" content="Temukan tempat laundry kiloan, cuci sepatu, home cleaning, cuci sofa, dan jasa kebersihan terdekat di lokasi Anda secara akurat berbasis peta interaktif.">
+  <link rel="canonical" href="https://bandarlaundry.github.io/directoryv2/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Laundry Directory V2.0" />
+  <meta property="og:title" content="Laundry Directory — Cari Laundry & Cleaning Terdekat" />
+  <meta property="og:description" content="Temukan laundry kiloan, cuci sepatu, home cleaning, dan jasa kebersihan terdekat berbasis peta interaktif." />
+  <meta property="og:url" content="https://bandarlaundry.github.io/directoryv2/" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=1200&auto=format&fit=crop&q=80" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- HUBUNGKAN DENGAN STYLE.CSS -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1><a href="./">Laundry Directory V2.0</a></h1>
+      <small style="opacity: 0.8;" id="user-status-text">Memuat status...</small>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-dark" id="dark-mode-toggle">🌙 Mode Gelap</button>
+      <div id="auth-buttons-wrapper">
+        <a href="./auth.html" class="btn btn-primary">🔑 Login / Register</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- SLOT IKLAN HALAMAN UTAMA: SETELAH HEADER -->
+  <div id="ad-slot-main-top" class="ad-slot-container"></div>
+
+  <div id="map"></div>
+
+  <main class="container">
+    <div class="controls">
+      <input type="text" id="search" placeholder="Cari laundry, cuci sepatu, kota...">
+      <button id="add-data-btn" class="btn btn-primary" style="display:none;">+ Tambah Usaha</button>
+    </div>
+
+    <div id="data-list" class="grid">
+      <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">Memuat data usaha...</div>
+    </div>
+
+    <div class="pagination" id="pagination" style="display: none;">
+      <button class="page-btn" id="p-first">&lt;&lt;</button>
+      <button class="page-btn" id="p-prev">&lt;</button>
+      <div id="p-numbers" style="display: flex; gap: 0.3rem;"></div>
+      <button class="page-btn" id="p-next">&gt;</button>
+      <button class="page-btn" id="p-last">&gt;&gt;</button>
+    </div>
+  </main>
+
+  <!-- SLOT IKLAN HALAMAN UTAMA: SEBELUM FOOTER -->
+  <div id="ad-slot-main-bottom" class="ad-slot-container"></div>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-links">
+        <a href="./about.html">Tentang Kami</a>
+        <a href="./contact.html">Kontak</a>
+        <a href="./auth.html">Login / Registrasi</a>
+      </div>
+      <div class="copyright">
+        &copy; <span id="current-year"></span> Laundry Directory V2.0. Hak Cipta Dilindungi.
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="add-modal">
+    <div class="modal-content">
+      <h2 style="color:var(--primary); margin-bottom:1rem;" id="modal-title">Tambah Usaha Baru</h2>
+      <form id="add-form">
+        <input type="hidden" id="f-id">
+        <div class="form-group"><label>Nama Usaha</label><input type="text" id="f-name" required placeholder="Contoh: Bandar Laundry"></div>
+        <div class="form-group"><label>Kategori</label>
+          <select id="f-category" required>
+            <option value="Laundry Kiloan">Laundry Kiloan</option>
+            <option value="Laundry Satuan">Laundry Satuan</option>
+            <option value="Cuci Sepatu">Cuci Sepatu</option>
+            <option value="Cuci Sofa">Cuci Sofa</option>
+            <option value="Home Cleaning">Home Cleaning</option>
+            <option value="Car Wash">Car Wash</option>
+          </select>
+        </div>
+
+        <div class="form-group"><label>Provinsi</label>
+          <select id="f-province" required>
+            <option value="">-- Pilih Provinsi --</option>
+            <option value="Jawa Barat">Jawa Barat</option>
+            <option value="DKI Jakarta">DKI Jakarta</option>
+            <option value="Jawa Tengah">Jawa Tengah</option>
+            <option value="Jawa Timur">Jawa Timur</option>
+            <option value="Banten">Banten</option>
+            <option value="Bali">Bali</option>
+          </select>
+        </div>
+
+        <div class="form-group"><label>Kota / Kabupaten</label><input type="text" id="f-city" required placeholder="Ketik nama kota (misal: Bogor)"></div>
+        <div class="form-group"><label>Alamat Jalan</label><input type="text" id="f-address" required placeholder="Jl. Raya No. 12"></div>
+
+        <div class="form-group">
+          <label>URL Gambar/Foto Usaha (Opsional, Maks 3 Image)</label>
+          <div id="image-inputs-container" style="display:flex; flex-direction:column; gap:0.4rem;">
+            <input type="url" class="f-img-input" placeholder="URL Gambar 1 (Utama/Thumbnail)">
+          </div>
+          <button type="button" class="btn btn-secondary" id="add-img-col-btn" style="margin-top:0.4rem; font-size:0.75rem; width:fit-content;">+ Tambah Kolom Gambar</button>
+        </div>
+
+        <div class="form-group">
+          <label>Pilih Lokasi di Peta</label>
+          <div id="picker-map"></div>
+        </div>
+
+        <div class="coord-container">
+          <div class="form-group">
+            <label>Latitude</label>
+            <input type="number" step="any" id="f-lat" required readonly style="background:var(--border);">
+          </div>
+          <div class="form-group">
+            <label>Longitude</label>
+            <input type="number" step="any" id="f-lng" required readonly style="background:var(--border);">
+          </div>
+        </div>
+
+        <div class="form-group"><label>WhatsApp</label><input type="text" id="f-wa" required placeholder="085712345678"></div>
+
+        <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+          <button type="submit" class="btn btn-primary" style="flex:1;">Simpan Data Usaha</button>
+          <button type="button" class="btn btn-secondary" id="close-modal-btn">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- HUBUNGKAN DENGAN SCRIPT.JS HUB UTAMA -->
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
