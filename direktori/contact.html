@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kontak Kami — Laundry Directory V2.0</title>
+  <meta name="description" content="Hubungi tim admin Laundry Directory V2.0 untuk pendaftaran usaha, klaim lokasi, verifikasi, atau bantuan teknis lainnya.">
+  <link rel="canonical" href="https://bandarlaundry.github.io/directoryv2/contact.html" />
+
+  <!-- HUBUNGKAN DENGAN STYLE.CSS -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <header>
+    <h1><a href="./">Laundry Directory V2.0</a></h1>
+    <div class="header-actions">
+      <button class="btn btn-dark" id="dark-mode-toggle">🌙 Mode Gelap</button>
+      <a href="./" class="btn btn-primary">← Ke Utama</a>
+    </div>
+  </header>
+
+  <!-- SLOT IKLAN HALAMAN DETAIL/STATIS: SETELAH HEADER -->
+  <div id="ad-slot-detail-top" class="ad-slot-container"></div>
+
+  <main class="container">
+    <article class="card" style="padding: 2rem; line-height: 1.6;">
+      <h1 style="color:var(--primary); font-size: 1.5rem;">Hubungi Kami</h1>
+      <p>Jika Anda memiliki pertanyaan mengenai pendaftaran usaha, klaim lokasi, verifikasi, atau bantuan teknis lainnya, silakan hubungi tim kami melalui saluran resmi di bawah ini:</p>
+
+      <div style="padding: 1rem; background: rgba(0,0,0,0.03); border-radius: 6px; border: 1px solid var(--border); margin-top: 0.5rem;">
+        <strong>📧 Email Resmi Admin:</strong>
+        <p>bandardeterjen@gmail.com</p>
+      </div>
+
+      <div style="padding: 1rem; background: rgba(0,0,0,0.03); border-radius: 6px; border: 1px solid var(--border); margin-top: 0.5rem;">
+        <strong>💬 WhatsApp Customer Support:</strong>
+        <p>+62 857-1234-5678</p>
+      </div>
+
+      <div style="padding: 1rem; background: rgba(0,0,0,0.03); border-radius: 6px; border: 1px solid var(--border); margin-top: 0.5rem;">
+        <strong>📍 Alamat Kantor Operasional:</strong>
+        <p>Cileungsi, Kabupaten Bogor, Jawa Barat, Indonesia</p>
+      </div>
+    </article>
+  </main>
+
+  <!-- SLOT IKLAN HALAMAN DETAIL/STATIS: SEBELUM FOOTER -->
+  <div id="ad-slot-detail-bottom" class="ad-slot-container"></div>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-links">
+        <a href="./about.html">Tentang Kami</a>
+        <a href="./contact.html">Kontak</a>
+        <a href="./auth.html">Login / Registrasi</a>
+      </div>
+      <div class="copyright">
+        &copy; <span id="current-year"></span> Laundry Directory V2.0. Hak Cipta Dilindungi.
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- HUBUNGKAN DENGAN SCRIPT.JS -->
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
