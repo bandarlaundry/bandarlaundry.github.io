@@ -48,7 +48,7 @@
 <body>
 
   <header>
-    <h1><a href="./" id="home-link">← Laundry Directory</a></h1>
+    <h1><a href="./">← Laundry Directory</a></h1>
     <div>
       <button class="btn btn-dark" id="dark-mode-toggle">🌙 Mode Gelap</button>
     </div>
@@ -88,13 +88,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    function getBasePath() {
-      const path = window.location.pathname;
-      if (path.startsWith('/direktori')) return '/direktori';
-      const segments = path.split('/').filter(Boolean);
-      return window.location.hostname.includes('github.io') && segments.length > 0 ? '/' + segments[0] : '';
-    }
-
     document.getElementById("current-year").innerText = new Date().getFullYear();
 
     const darkToggle = document.getElementById("dark-mode-toggle");
@@ -133,21 +126,12 @@
     document.addEventListener("DOMContentLoaded", async () => {
       renderAds();
 
-      const basePath = getBasePath();
-      const homeLink = document.getElementById("home-link");
-      if (homeLink) homeLink.href = `${basePath}/`;
-
-      // BACA SEGMEN SLUG AKHIR DARI URL
-      const pathSegments = window.location.pathname.split('/').filter(Boolean);
-      let slug = pathSegments[pathSegments.length - 1];
-
+      // BACA SLUG DARI PARAMETER ?slug=xxx
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("slug")) {
-        slug = urlParams.get("slug");
-      }
+      const slug = urlParams.get("slug");
 
-      if (!slug || slug === 'index.html' || slug === '404.html' || slug === 'detail.html') {
-        showError("URL tidak valid.");
+      if (!slug) {
+        showError("Parameter usaha tidak ditemukan dalam tautan.");
         return;
       }
 
@@ -156,7 +140,7 @@
         const snap = await getDocs(q);
 
         if (snap.empty) {
-          showError(`Usaha "${slug}" tidak ditemukan atau belum disetujui Admin.`);
+          showError(`Usaha dengan slug "${slug}" tidak ditemukan.`);
           return;
         }
 
@@ -164,7 +148,7 @@
         renderDetail(businessData);
         injectSEOMetadata(businessData);
       } catch (err) {
-        showError("Gagal mengambil data: " + err.message);
+        showError("Gagal mengambil data dari database: " + err.message);
       }
     });
 
@@ -250,11 +234,10 @@
     }
 
     function showError(msg) {
-      const basePath = getBasePath();
       document.getElementById("content").innerHTML = `
         <h2 style="color:#ef4444;">Usaha Tidak Ditemukan</h2>
         <p style="margin-top:0.5rem;">${msg}</p>
-        <a href="${basePath}/" class="btn btn-primary" style="width:fit-content; margin-top:1rem;">← Kembali ke Utama</a>
+        <a href="./" class="btn btn-primary" style="width:fit-content; margin-top:1rem;">← Kembali ke Utama</a>
       `;
     }
   </script>
