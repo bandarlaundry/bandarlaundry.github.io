@@ -8,6 +8,7 @@
   <meta id="seo-desc" name="description" content="Lihat alamat lengkap, nomor WhatsApp, lokasi peta, dan layanan usaha kebersihan.">
   <link id="seo-canonical" rel="canonical" href="" />
 
+  <!-- OPEN GRAPH META FOR SOCIAL MEDIA SHARING -->
   <meta property="og:type" content="business.business" />
   <meta property="og:site_name" content="Laundry Directory V2.0" />
   <meta id="og-title" property="og:title" content="Memuat Detail Usaha..." />
@@ -16,14 +17,15 @@
   <meta id="og-image" property="og:image" content="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=1200&auto=format&fit=crop&q=80" />
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="./style.css" />
+  <!-- PASTIKAN PATH CSS KE ROOT -->
+  <link rel="stylesheet" href="/style.css" id="main-css-link" />
 
   <script id="json-ld-schema" type="application/ld+json"></script>
 </head>
 <body>
 
   <header>
-    <h1><a href="./">← Laundry Directory V2.0</a></h1>
+    <h1><a href="/" id="home-link">← Laundry Directory V2.0</a></h1>
     <div class="header-actions">
       <button class="btn btn-dark" id="dark-mode-toggle">🌙 Mode Gelap</button>
     </div>
@@ -42,9 +44,9 @@
   <footer>
     <div class="footer-container">
       <div class="footer-links">
-        <a href="./about.html">Tentang Kami</a>
-        <a href="./contact.html">Kontak</a>
-        <a href="./auth.html">Login / Registrasi</a>
+        <a href="/about.html" class="nav-link">Tentang Kami</a>
+        <a href="/contact.html" class="nav-link">Kontak</a>
+        <a href="/auth.html" class="nav-link">Login / Registrasi</a>
       </div>
       <div class="copyright">
         &copy; <span id="current-year"></span> Laundry Directory V2.0. Hak Cipta Dilindungi.
@@ -56,33 +58,49 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
-  <!-- IMPOR SDK LENGKAP & DIPERBAIKI DARI FIREBASE-FIRESTORE.JS -->
   <script type="module">
-    import { db } from "./script.js";
+    import { db, getBasePath } from "/script.js";
     import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // BACA SLUG DARI URL PATHNAME (/category/city/slug)
-      const parts = window.location.pathname.split('/').filter(Boolean);
-      let slug = parts[parts.length - 1];
+      // 1. SESUAIKAN RELATIVE PATH UNTUK GITHUB PAGES REPO SUBFOLDER
+      const basePath = getBasePath();
+      
+      // Update link aset & navigasi agar sesuai nama repositori
+      const cssLink = document.getElementById("main-css-link");
+      if (cssLink && basePath) cssLink.href = `${basePath}/style.css`;
+      
+      const homeLink = document.getElementById("home-link");
+      if (homeLink) homeLink.href = `${basePath}/`;
 
-      // Jika diakses dengan query parameter
+      document.querySelectorAll(".nav-link").forEach(el => {
+        const target = el.getAttribute("href");
+        if (target && basePath) el.href = `${basePath}${target}`;
+      });
+
+      // 2. PARSING SLUG DARI PATHNAME
+      // URL: /nama-repo/kategori/kota/slug-usaha ATAU /kategori/kota/slug-usaha
+      const pathSegments = window.location.pathname.split('/').filter(Boolean);
+      let slug = pathSegments[pathSegments.length - 1];
+
+      // Fallback query string
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get("slug")) {
         slug = urlParams.get("slug");
       }
 
       if (!slug || slug === 'index.html' || slug === '404.html' || slug === 'detail.html') {
-        showError("URL tidak valid.");
+        showError("URL tidak valid atau parameter slug tidak ditemukan.");
         return;
       }
 
+      // 3. FETCH DATA DARI FIRESTORE BERDASARKAN SLUG
       try {
         const q = query(collection(db, "businesses"), where("slug", "==", slug));
         const snap = await getDocs(q);
 
         if (snap.empty) {
-          showError("Usaha tidak ditemukan atau belum disetujui Admin.");
+          showError(`Usaha dengan kata kunci "${slug}" tidak ditemukan atau belum di-approve Admin.`);
           return;
         }
 
@@ -90,7 +108,7 @@
         renderDetail(businessData);
         injectSEOMetadata(businessData);
       } catch (err) {
-        console.error("Firestore error:", err);
+        console.error("Firestore Error:", err);
         showError("Gagal mengambil data dari database: " + err.message);
       }
     });
@@ -131,7 +149,7 @@
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
           L.marker([b.latitude, b.longitude]).addTo(map).bindPopup(`<b>${b.name}</b>`).openPopup();
           map.invalidateSize();
-        }, 100);
+        }, 150);
       }
     }
 
@@ -177,14 +195,15 @@
     }
 
     function showError(msg) {
+      const basePath = getBasePath();
       document.getElementById("content").innerHTML = `
-        <h2 style="color:#ef4444;">Usaha Tidak Ditemukan</h2>
-        <p style="margin-top:0.5rem;">${msg}</p>
-        <a href="./" class="btn btn-primary" style="width:fit-content; margin-top:1rem;">← Kembali ke Utama</a>
+        <h2 style="color:#ef4444;">Usaha Tidak Ditemukan (404)</h2>
+        <p style="margin-top:0.5rem; color:var(--text-muted);">${msg}</p>
+        <a href="${basePath}/" class="btn btn-primary" style="width:fit-content; margin-top:1rem;">← Kembali ke Utama</a>
       `;
     }
   </script>
 
-  <script type="module" src="./script.js"></script>
+  <script type="module" src="/script.js"></script>
 </body>
 </html>
