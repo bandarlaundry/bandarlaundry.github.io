@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, setDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAY2JOM_GK_c8MIKOOROjG61XtC-VxF3Gc",
@@ -15,12 +15,10 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-// FUNGSI GETBASEPATH() OTOMATIS & PORTABLE (Bisa di Folder Mana Saja)
+// FUNGSI GETBASEPATH() PORTABLE UNTUK GITHUB PAGES / LOCAL
 export function getBasePath() {
   const path = window.location.pathname;
   const segments = path.split('/').filter(Boolean);
-  
-  // Jika di-host di subfolder GitHub Pages (misal /folder-baru/ atau /directoryv2/)
   if (window.location.hostname.includes('github.io') && segments.length > 0) {
     return '/' + segments[0];
   }
@@ -59,13 +57,7 @@ export async function renderAds() {
 
     ads.forEach(ad => {
       if (!ad.imageUrl || !ad.linkUrl) return;
-
-      const adHtml = `
-        <a href="${ad.linkUrl}" target="_blank" class="ad-banner-link">
-          <img src="${ad.imageUrl}" class="ad-banner-img" alt="Iklan Banner">
-        </a>
-      `;
-
+      const adHtml = `<a href="${ad.linkUrl}" target="_blank" class="ad-banner-link"><img src="${ad.imageUrl}" class="ad-banner-img" alt="Iklan Banner"></a>`;
       if (ad.placement === 'main_top' && slotMainTop) slotMainTop.innerHTML = adHtml;
       if (ad.placement === 'main_bottom' && slotMainBottom) slotMainBottom.innerHTML = adHtml;
       if (ad.placement === 'detail_top' && slotDetailTop) slotDetailTop.innerHTML = adHtml;
@@ -76,7 +68,7 @@ export async function renderAds() {
   }
 }
 
-// SETUP UMUM & DARK MODE
+// SETUP DOM GLOBAL & DARK MODE
 document.addEventListener("DOMContentLoaded", () => {
   renderAds();
 
