@@ -3,28 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard — Laundry Directory V2.0</title>
-  <link rel="stylesheet" href="./style.css" />
+  <title>Admin Dashboard — Laundry Directory</title>
   <style>
+    :root { --header-bg: #1e3a8a; --header-text: #ffffff; --footer-bg: #f97316; --footer-text: #000000; --bg: #f8fafc; --text: #000000; --border: #e2e8f0; --primary: #0284c7; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    header { background: var(--header-bg); color: var(--header-text); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; }
+    header h1 { font-size: 1.25rem; }
+    .header-btns { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+
+    .container { max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; flex: 1; width: 100%; }
+    .btn { padding: 0.5rem 0.9rem; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-secondary { background: #e2e8f0; color: #000; }
+    
+    .section-box { background: white; padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1.5rem; }
     .admin-cards-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
-    .admin-item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .admin-item-card { background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
     .admin-item-header { display: flex; justify-content: space-between; align-items: center; }
     .admin-item-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+
+    .badge { padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; width: fit-content; }
+    .badge-pending { background: #fef3c7; color: #b45309; }
+    .badge-active { background: #dcfce7; color: #15803d; }
+
+    .pagination { display: flex; justify-content: center; gap: 0.3rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .page-btn { padding: 0.4rem 0.8rem; border: 1px solid var(--border); background: white; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem; margin-top: 1rem; }
+    .gallery-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
+    .gallery-card img { width: 100%; height: 100px; object-fit: cover; border-radius: 4px; }
+
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; border-radius: 8px; width: 100%; max-width: 450px; padding: 1.5rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.8rem; }
+    .form-group input, .form-group select { padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; }
+
+    footer { background: var(--footer-bg); color: var(--footer-text); padding: 1.5rem 1rem; margin-top: auto; border-top: 1px solid var(--border); }
+    .footer-container { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; align-items: center; text-align: center; }
+    @media (min-width: 640px) { .footer-container { flex-direction: row; justify-content: space-between; } }
+
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 0.8rem 1.5rem; border-radius: 999px; font-size: 0.85rem; z-index: 3000; display: none; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Admin Panel V2.0</h1>
-    <div class="header-actions">
+    <h1>Admin Panel</h1>
+    <div class="header-btns">
       <a href="./" class="btn btn-secondary">🌐 Ke Utama</a>
       <button id="logout-btn" class="btn btn-danger">Logout</button>
     </div>
   </header>
 
   <main class="container">
-    <!-- 1. MANAJEMEN IKLAN BANNER (KHUSUS ADMIN) -->
-    <section class="section-box" style="background:var(--surface); padding:1.2rem; border-radius:8px; border:1px solid var(--border); margin-bottom:1.5rem;">
+    <!-- 1. MANAJEMEN IKLAN BANNER -->
+    <section class="section-box">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
         <h2>Manajemen Iklan Banner</h2>
         <button id="open-ad-modal-btn" class="btn btn-primary">+ Tambah Iklan Baru</button>
@@ -33,7 +72,7 @@
     </section>
 
     <!-- 2. MANAJEMEN USER -->
-    <section class="section-box" style="background:var(--surface); padding:1.2rem; border-radius:8px; border:1px solid var(--border); margin-bottom:1.5rem;">
+    <section class="section-box">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
         <h2>Manajemen User / Owner</h2>
         <button id="open-user-modal-btn" class="btn btn-primary">+ Tambah User Manual</button>
@@ -42,7 +81,7 @@
     </section>
 
     <!-- 3. MODERASI USAHA -->
-    <section class="section-box" style="background:var(--surface); padding:1.2rem; border-radius:8px; border:1px solid var(--border); margin-bottom:1.5rem;">
+    <section class="section-box">
       <h2>Moderasi Usaha & Listing</h2>
       <div id="business-cards-wrapper" class="admin-cards-list">Memuat data usaha...</div>
       
@@ -55,13 +94,13 @@
       </div>
     </section>
 
-    <!-- 4. KELOLA GALERI -->
-    <section class="section-box" style="background:var(--surface); padding:1.2rem; border-radius:8px; border:1px solid var(--border); margin-bottom:1.5rem;">
+    <!-- 4. KELOLA GALERI RANDOM -->
+    <section class="section-box">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
         <h2>Kelola Galeri Thumbnail Random Admin</h2>
         <button id="open-gallery-modal-btn" class="btn btn-primary">+ Tambah Image URL Galeri</button>
       </div>
-      <div id="gallery-grid-wrapper" class="gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:0.8rem; margin-top:1rem;">Memuat galeri...</div>
+      <div id="gallery-grid-wrapper" class="gallery-grid">Memuat galeri...</div>
       
       <div class="pagination" id="g-pagination" style="display:none;">
         <button class="page-btn" id="gp-first">&lt;&lt;</button>
@@ -75,24 +114,24 @@
 
   <footer>
     <div class="footer-container">
-      <div>Dashboard Admin Laundry Directory V2.0</div>
+      <div>Dashboard Admin Laundry Directory</div>
       <div>&copy; <span id="current-year"></span> Hak Cipta Dilindungi.</div>
     </div>
   </footer>
 
-  <!-- MODAL FORM TAMBAH/EDIT IKLAN -->
+  <!-- MODAL TAMBAH/EDIT IKLAN -->
   <div class="modal" id="ad-modal">
     <div class="modal-content">
       <h2 style="color:var(--primary); margin-bottom:1rem;" id="ad-modal-title">Tambah Iklan Baru</h2>
       <form id="add-ad-form">
         <input type="hidden" id="ad-id">
         <div class="form-group">
-          <label>URL Gambar Banner Iklan (Mobile-Friendly)</label>
+          <label>URL Gambar Banner Iklan</label>
           <input type="url" id="ad-image-url" required placeholder="https://images.unsplash.com/photo-...">
         </div>
         <div class="form-group">
           <label>URL Link Tujuan Saat Klik Iklan</label>
-          <input type="url" id="ad-target-url" required placeholder="https://wa.me/6285712345678 atau https://website.com">
+          <input type="url" id="ad-target-url" required placeholder="https://wa.me/6285712345678">
         </div>
         <div class="form-group">
           <label>Penempatan Iklan</label>
@@ -150,6 +189,397 @@
 
   <div class="toast" id="toast"></div>
 
-  <script type="module" src="./script.js"></script>
+  <!-- KOREKSI IMPOR SDK FIREBASE BERSIH -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, setDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAY2JOM_GK_c8MIKOOROjG61XtC-VxF3Gc",
+      authDomain: "laundry-directory-1915d.firebaseapp.com",
+      projectId: "laundry-directory-1915d",
+      storageBucket: "laundry-directory-1915d.appspot.com",
+      messagingSenderId: "336437234560",
+      appId: "1:336437234560:web:69dc7cbb36704c9f614f65"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.getElementById("current-year").innerText = new Date().getFullYear();
+
+    let allBusinesses = [], bCurrentPage = 1;
+    let allGallery = [], gCurrentPage = 1;
+    const PER_PAGE = 12;
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.style.background = isError ? "#ef4444" : "#16a34a";
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 3000);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user || user.email !== "bandardeterjen@gmail.com") {
+        alert("Akses Ditolak! Khusus Super Admin.");
+        window.location.href = "./auth.html";
+        return;
+      }
+      loadAds();
+      loadUsers();
+      loadBusinesses();
+      loadGallery();
+    });
+
+    document.getElementById("logout-btn").onclick = () => signOut(auth).then(() => window.location.href = "./auth.html");
+
+    // 1. MANAJEMEN IKLAN BANNER
+    const adModal = document.getElementById("ad-modal");
+    document.getElementById("open-ad-modal-btn").onclick = () => {
+      document.getElementById("ad-modal-title").innerText = "Tambah Iklan Baru";
+      document.getElementById("add-ad-form").reset();
+      document.getElementById("ad-id").value = "";
+      adModal.classList.add("active");
+    };
+    document.getElementById("close-ad-modal-btn").onclick = () => adModal.classList.remove("active");
+
+    document.getElementById("add-ad-form").onsubmit = async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("ad-id").value;
+      const imageUrl = document.getElementById("ad-image-url").value.trim();
+      const linkUrl = document.getElementById("ad-target-url").value.trim();
+      const placement = document.getElementById("ad-placement").value;
+
+      try {
+        if (id) {
+          await updateDoc(doc(db, "advertisements", id), { imageUrl, linkUrl, placement, updatedAt: serverTimestamp() });
+          showToast("Iklan berhasil diperbarui!");
+        } else {
+          await addDoc(collection(db, "advertisements"), { imageUrl, linkUrl, placement, createdAt: serverTimestamp() });
+          showToast("Iklan baru berhasil ditambahkan!");
+        }
+        adModal.classList.remove("active");
+        loadAds();
+      } catch (err) { showToast("Gagal: " + err.message, true); }
+    };
+
+    async function loadAds() {
+      const wrapper = document.getElementById("ads-cards-wrapper");
+      try {
+        const snap = await getDocs(collection(db, "advertisements"));
+        wrapper.innerHTML = "";
+
+        if (snap.empty) { wrapper.innerHTML = "<div>Belum ada materi iklan. Tambahkan iklan baru.</div>"; return; }
+
+        snap.forEach(d => {
+          const ad = { id: d.id, ...d.data() };
+          const card = document.createElement("div");
+          card.className = "admin-item-card";
+          card.innerHTML = `
+            <div class="admin-item-header">
+              <strong>${ad.placement}</strong>
+              <span class="badge badge-active">Aktif</span>
+            </div>
+            <img src="${ad.imageUrl}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;" alt="Banner">
+            <div><small>Link:</small> <a href="${ad.linkUrl}" target="_blank">${ad.linkUrl}</a></div>
+            <div class="admin-item-actions">
+              <button class="btn btn-primary" id="edit-ad-${ad.id}">Edit Iklan</button>
+              <button class="btn btn-danger" id="del-ad-${ad.id}">Hapus</button>
+            </div>
+          `;
+          wrapper.appendChild(card);
+
+          setTimeout(() => {
+            document.getElementById(`edit-ad-${ad.id}`).onclick = () => {
+              document.getElementById("ad-modal-title").innerText = "Edit Iklan";
+              document.getElementById("ad-id").value = ad.id;
+              document.getElementById("ad-image-url").value = ad.imageUrl;
+              document.getElementById("ad-target-url").value = ad.linkUrl;
+              document.getElementById("ad-placement").value = ad.placement;
+              adModal.classList.add("active");
+            };
+
+            document.getElementById(`del-ad-${ad.id}`).onclick = async () => {
+              await deleteDoc(doc(db, "advertisements", ad.id));
+              showToast("Iklan dihapus!");
+              loadAds();
+            };
+          }, 0);
+        });
+      } catch (err) {
+        wrapper.innerHTML = `<div>Gagal memuat iklan: ${err.message}</div>`;
+      }
+    }
+
+    // 2. MANAJEMEN USER
+    async function loadUsers() {
+      const wrapper = document.getElementById("user-cards-wrapper");
+      try {
+        const snap = await getDocs(collection(db, "users"));
+        wrapper.innerHTML = "";
+
+        if (snap.empty) { wrapper.innerHTML = "<div>Belum ada data user.</div>"; return; }
+
+        snap.forEach(d => {
+          const u = { id: d.id, ...d.data() };
+          if (u.role === 'admin') return;
+
+          const item = document.createElement("div");
+          item.className = "admin-item-card";
+          item.innerHTML = `
+            <div class="admin-item-header">
+              <strong>${u.name || 'Owner'}</strong>
+              <span class="badge ${u.status === 'approved' ? 'badge-active' : 'badge-pending'}">${u.status || 'pending'}</span>
+            </div>
+            <div><small>Email:</small> ${u.email}</div>
+            <div><small>WA:</small> ${u.phone || '-'}</div>
+            <div class="admin-item-actions">
+              ${u.status !== 'approved' ? `<button class="btn btn-success" id="app-u-${u.id}">Approve User</button>` : ''}
+              <button class="btn btn-danger" id="del-u-${u.id}">Hapus</button>
+            </div>
+          `;
+          wrapper.appendChild(item);
+
+          setTimeout(() => {
+            if (document.getElementById(`app-u-${u.id}`)) {
+              document.getElementById(`app-u-${u.id}`).onclick = async () => {
+                await updateDoc(doc(db, "users", u.id), { status: "approved" });
+                showToast(`User approved!`);
+                loadUsers();
+              };
+            }
+            document.getElementById(`del-u-${u.id}`).onclick = async () => {
+              await deleteDoc(doc(db, "users", u.id));
+              showToast("User dihapus.");
+              loadUsers();
+            };
+          }, 0);
+        });
+      } catch (err) {
+        wrapper.innerHTML = `<div>Gagal memuat user: ${err.message}</div>`;
+      }
+    }
+
+    const userModal = document.getElementById("user-modal");
+    document.getElementById("open-user-modal-btn").onclick = () => userModal.classList.add("active");
+    document.getElementById("close-user-modal-btn").onclick = () => userModal.classList.remove("active");
+
+    document.getElementById("add-user-form").onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, document.getElementById("u-email").value.trim(), document.getElementById("u-password").value);
+        await setDoc(doc(db, "users", cred.user.uid), {
+          uid: cred.user.uid,
+          name: document.getElementById("u-name").value,
+          phone: document.getElementById("u-phone").value,
+          email: document.getElementById("u-email").value.trim(),
+          role: "owner", status: "approved",
+          createdAt: serverTimestamp()
+        });
+        showToast("User Owner Ditambahkan!");
+        userModal.classList.remove("active");
+        document.getElementById("add-user-form").reset();
+        loadUsers();
+      } catch (err) { showToast("Gagal: " + err.message, true); }
+    };
+
+    // 3. MODERASI USAHA
+    async function loadBusinesses() {
+      try {
+        const snap = await getDocs(collection(db, "businesses"));
+        allBusinesses = [];
+        snap.forEach(d => allBusinesses.push({ id: d.id, ...d.data() }));
+        renderBusinessesList();
+      } catch (err) {
+        document.getElementById("business-cards-wrapper").innerHTML = `<div>Gagal memuat usaha: ${err.message}</div>`;
+      }
+    }
+
+    function renderBusinessesList() {
+      const wrapper = document.getElementById("business-cards-wrapper");
+      wrapper.innerHTML = "";
+
+      if (allBusinesses.length === 0) {
+        wrapper.innerHTML = "<div>Tidak ada data usaha.</div>";
+        document.getElementById("b-pagination").style.display = "none";
+        return;
+      }
+
+      const totalPages = Math.ceil(allBusinesses.length / PER_PAGE);
+      if (bCurrentPage > totalPages) bCurrentPage = totalPages;
+      if (bCurrentPage < 1) bCurrentPage = 1;
+
+      const start = (bCurrentPage - 1) * PER_PAGE;
+      const pageItems = allBusinesses.slice(start, start + PER_PAGE);
+
+      pageItems.forEach(b => {
+        const item = document.createElement("div");
+        item.className = "admin-item-card";
+        item.innerHTML = `
+          <div class="admin-item-header">
+            <strong>${b.name}</strong>
+            <small style="color:var(--primary); font-weight:bold;">${b.category}</small>
+          </div>
+          <div><small>Lokasi:</small> ${b.city}, ${b.province || ''}</div>
+          <div style="margin-top:4px;">
+            <label style="font-size:0.8rem; font-weight:bold;">Status Usaha: </label>
+            <select id="status-sel-${b.id}" style="padding:4px; border-radius:4px;">
+              <option value="active" ${b.status === 'active' ? 'selected' : ''}>Active (Publik)</option>
+              <option value="pending" ${b.status === 'pending' ? 'selected' : ''}>Pending (Review)</option>
+              <option value="draft" ${b.status === 'draft' ? 'selected' : ''}>Draft</option>
+              <option value="inactive" ${b.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+            </select>
+          </div>
+          <div class="admin-item-actions">
+            <button class="btn btn-primary" id="save-b-${b.id}">Simpan Status</button>
+            <button class="btn btn-danger" id="del-b-${b.id}">Hapus Usaha</button>
+          </div>
+        `;
+        wrapper.appendChild(item);
+
+        setTimeout(() => {
+          document.getElementById(`save-b-${b.id}`).onclick = async () => {
+            const newStatus = document.getElementById(`status-sel-${b.id}`).value;
+            await updateDoc(doc(db, "businesses", b.id), { status: newStatus });
+            showToast(`Status ${b.name} diubah menjadi ${newStatus}!`);
+            loadBusinesses();
+          };
+
+          document.getElementById(`del-b-${b.id}`).onclick = async () => {
+            await deleteDoc(doc(db, "businesses", b.id));
+            showToast(`Usaha ${b.name} dihapus.`);
+            loadBusinesses();
+          };
+        }, 0);
+      });
+
+      renderBusinessesPagination(totalPages);
+    }
+
+    function renderBusinessesPagination(totalPages) {
+      const container = document.getElementById("b-pagination");
+      const numbersEl = document.getElementById("bp-numbers");
+
+      if (totalPages <= 1) { container.style.display = "none"; return; }
+      container.style.display = "flex";
+      numbersEl.innerHTML = "";
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.className = `page-btn ${i === bCurrentPage ? 'active' : ''}`;
+        btn.innerText = i;
+        btn.onclick = () => { bCurrentPage = i; renderBusinessesList(); };
+        numbersEl.appendChild(btn);
+      }
+
+      document.getElementById("bp-first").disabled = bCurrentPage === 1;
+      document.getElementById("bp-prev").disabled = bCurrentPage === 1;
+      document.getElementById("bp-next").disabled = bCurrentPage === totalPages;
+      document.getElementById("bp-last").disabled = bCurrentPage === totalPages;
+
+      document.getElementById("bp-first").onclick = () => { bCurrentPage = 1; renderBusinessesList(); };
+      document.getElementById("bp-prev").onclick = () => { if (bCurrentPage > 1) { bCurrentPage--; renderBusinessesList(); } };
+      document.getElementById("bp-next").onclick = () => { if (bCurrentPage < totalPages) { bCurrentPage++; renderBusinessesList(); } };
+      document.getElementById("bp-last").onclick = () => { bCurrentPage = totalPages; renderBusinessesList(); };
+    }
+
+    // 4. GALERI RANDOM
+    async function loadGallery() {
+      try {
+        const snap = await getDocs(collection(db, "adminGallery"));
+        allGallery = [];
+        snap.forEach(d => allGallery.push({ id: d.id, ...d.data() }));
+        renderGalleryGrid();
+      } catch (err) {
+        document.getElementById("gallery-grid-wrapper").innerHTML = `<div>Gagal memuat galeri: ${err.message}</div>`;
+      }
+    }
+
+    function renderGalleryGrid() {
+      const wrapper = document.getElementById("gallery-grid-wrapper");
+      wrapper.innerHTML = "";
+
+      if (allGallery.length === 0) {
+        wrapper.innerHTML = "<div style='grid-column:1/-1;'>Belum ada gambar galeri.</div>";
+        document.getElementById("g-pagination").style.display = "none";
+        return;
+      }
+
+      const totalPages = Math.ceil(allGallery.length / PER_PAGE);
+      if (gCurrentPage > totalPages) gCurrentPage = totalPages;
+      if (gCurrentPage < 1) gCurrentPage = 1;
+
+      const start = (gCurrentPage - 1) * PER_PAGE;
+      const pageItems = allGallery.slice(start, start + PER_PAGE);
+
+      pageItems.forEach(g => {
+        const card = document.createElement("div");
+        card.className = "gallery-card";
+        card.innerHTML = `
+          <img src="${g.url}" alt="Gallery">
+          <button class="btn btn-danger" style="font-size:0.7rem; padding:2px;" id="del-g-${g.id}">Hapus</button>
+        `;
+        wrapper.appendChild(card);
+
+        setTimeout(() => {
+          document.getElementById(`del-g-${g.id}`).onclick = async () => {
+            await deleteDoc(doc(db, "adminGallery", g.id));
+            showToast("Gambar dihapus!");
+            loadGallery();
+          };
+        }, 0);
+      });
+
+      renderGalleryPagination(totalPages);
+    }
+
+    function renderGalleryPagination(totalPages) {
+      const container = document.getElementById("g-pagination");
+      const numbersEl = document.getElementById("gp-numbers");
+
+      if (totalPages <= 1) { container.style.display = "none"; return; }
+      container.style.display = "flex";
+      numbersEl.innerHTML = "";
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.className = `page-btn ${i === gCurrentPage ? 'active' : ''}`;
+        btn.innerText = i;
+        btn.onclick = () => { gCurrentPage = i; renderGalleryGrid(); };
+        numbersEl.appendChild(btn);
+      }
+
+      document.getElementById("gp-first").disabled = gCurrentPage === 1;
+      document.getElementById("gp-prev").disabled = gCurrentPage === 1;
+      document.getElementById("gp-next").disabled = gCurrentPage === totalPages;
+      document.getElementById("gp-last").disabled = gCurrentPage === totalPages;
+
+      document.getElementById("gp-first").onclick = () => { gCurrentPage = 1; renderGalleryGrid(); };
+      document.getElementById("gp-prev").onclick = () => { if (gCurrentPage > 1) { gCurrentPage--; renderGalleryGrid(); } };
+      document.getElementById("gp-next").onclick = () => { if (gCurrentPage < totalPages) { gCurrentPage++; renderGalleryGrid(); } };
+      document.getElementById("gp-last").onclick = () => { gCurrentPage = totalPages; renderGalleryGrid(); };
+    }
+
+    const galleryModal = document.getElementById("gallery-modal");
+    document.getElementById("open-gallery-modal-btn").onclick = () => galleryModal.classList.add("active");
+    document.getElementById("close-gallery-modal-btn").onclick = () => galleryModal.classList.remove("active");
+
+    document.getElementById("add-gallery-form").onsubmit = async (e) => {
+      e.preventDefault();
+      const url = document.getElementById("g-url").value.trim();
+      if (url) {
+        try {
+          await addDoc(collection(db, "adminGallery"), { url, createdAt: serverTimestamp() });
+          showToast("Gambar ditambahkan!");
+          galleryModal.classList.remove("active");
+          document.getElementById("add-gallery-form").reset();
+          loadGallery();
+        } catch (err) { showToast("Gagal: " + err.message, true); }
+      }
+    };
+  </script>
 </body>
 </html>
