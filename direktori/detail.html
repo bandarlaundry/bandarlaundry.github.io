@@ -54,35 +54,36 @@
 
   <div class="toast" id="toast"></div>
 
+  <!-- LEAFLET JS SCRIPT -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
+  <!-- MODUL LOGIKA DETAIL DENGAN FIRESTORE SDK PERBAIKAN -->
   <script type="module">
     import { db } from "./script.js";
-    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"; // Dipanggil via Firebase App SDK
-    import { collection as fCollection, query as fQuery, where as fWhere, getDocs as fGetDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // 1. TANGKAP SLUG DARI QUERY PARAMETER (?slug=nama-usaha)
+      // 1. Tangkap slug dari Query Parameter ?slug=xxx
       const urlParams = new URLSearchParams(window.location.search);
       let slug = urlParams.get("slug");
 
-      // 2. FALLBACK TANGKAP DARI PATHNAME JIKA DIALIKAN
+      // 2. Fallback tangkap dari Pathname jika diakses langsung
       if (!slug) {
         const parts = window.location.pathname.split('/').filter(Boolean);
         slug = parts[parts.length - 1];
       }
 
-      if (!slug || slug === 'detail.html' || slug === 'index.html') {
+      if (!slug || slug === 'detail.html' || slug === 'index.html' || slug === '404.html') {
         showError("URL atau kata kunci usaha tidak ditemukan.");
         return;
       }
 
       try {
-        const q = fQuery(fCollection(db, "businesses"), fWhere("slug", "==", slug));
-        const snap = await fGetDocs(q);
+        const q = query(collection(db, "businesses"), where("slug", "==", slug));
+        const snap = await getDocs(q);
 
         if (snap.empty) {
-          showError("Usaha tidak ditemukan atau belum aktif.");
+          showError("Usaha tidak ditemukan atau belum disetujui Admin.");
           return;
         }
 
@@ -90,6 +91,7 @@
         renderDetail(businessData);
         injectSEOMetadata(businessData);
       } catch (err) {
+        console.error("Firestore error:", err);
         showError("Gagal mengambil data dari database: " + err.message);
       }
     });
@@ -105,10 +107,10 @@
 
       document.getElementById("content").innerHTML = `
         ${galleryHtml}
-        <span class="badge">${b.category}</span>
+        <span class="badge" style="margin-top:0.5rem;">${b.category}</span>
         <h1 style="color:var(--primary); font-size:1.5rem;">${b.name} ${b.city || ''}</h1>
         <p style="color:var(--text-muted);">${b.description || 'Layanan profesional, cepat, dan terpercaya.'}</p>
-        <hr style="border:0; border-top:1px solid var(--border);">
+        <hr style="border:0; border-top:1px solid var(--border); margin:0.5rem 0;">
         <div style="font-size:0.9rem; display:flex; flex-direction:column; gap:6px;">
           <div><strong>📍 Alamat:</strong> ${b.address}, ${b.city}, ${b.province || ''}</div>
           <div><strong>🕒 Jam Operasional:</strong> ${b.openingHours || '08:00 - 20:00'}</div>
@@ -121,13 +123,17 @@
         </div>
 
         <h3 style="margin-top:1rem;">Lokasi Peta</h3>
-        <div id="detail-map" style="height:260px; width:100%; border-radius:8px; border:1px solid var(--border);"></div>
+        <div id="detail-map" style="height:280px; width:100%; border-radius:8px; border:1px solid var(--border); margin-top:0.5rem;"></div>
       `;
 
+      // Render Peta Leaflet & Invalidate Size
       if (b.latitude && b.longitude) {
-        const map = L.map('detail-map').setView([b.latitude, b.longitude], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        L.marker([b.latitude, b.longitude]).addTo(map).bindPopup(b.name).openPopup();
+        setTimeout(() => {
+          const map = L.map('detail-map').setView([b.latitude, b.longitude], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+          L.marker([b.latitude, b.longitude]).addTo(map).bindPopup(`<b>${b.name}</b>`).openPopup();
+          map.invalidateSize();
+        }, 100);
       }
     }
 
@@ -173,7 +179,11 @@
     }
 
     function showError(msg) {
-      document.getElementById("content").innerHTML = `<h2>Usaha Tidak Ditemukan</h2><p>${msg}</p><a href="./" class="btn btn-primary" style="width:fit-content; margin-top:1rem;">Kembali ke Utama</a>`;
+      document.getElementById("content").innerHTML = `
+        <h2 style="color:#ef4444;">Usaha Tidak Ditemukan</h2>
+        <p style="margin-top:0.5rem;">${msg}</p>
+        <a href="./" class="btn btn-primary" style="width:fit-content; margin-top:1rem;">← Kembali ke Utama</a>
+      `;
     }
   </script>
 
