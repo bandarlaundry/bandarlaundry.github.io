@@ -58,38 +58,39 @@
   
   <script type="module">
     import { db } from "./script.js";
-    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"; // Dipanggil via Firebase App SDK
+    import { collection as fCollection, query as fQuery, where as fWhere, getDocs as fGetDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // BACA SLUG DARI URL PATHNAME
-      const parts = window.location.pathname.split('/').filter(Boolean);
-      let slug = parts[parts.length - 1];
-
-      // JIKA URL MENGGUNAKAN QUERY PARAMETER (?slug=xxx)
+      // 1. TANGKAP SLUG DARI QUERY PARAMETER (?slug=nama-usaha)
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("slug")) {
-        slug = urlParams.get("slug");
+      let slug = urlParams.get("slug");
+
+      // 2. FALLBACK TANGKAP DARI PATHNAME JIKA DIALIKAN
+      if (!slug) {
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        slug = parts[parts.length - 1];
       }
 
-      if (!slug || slug === 'index.html' || slug === '404.html') {
-        showError("URL tidak valid.");
+      if (!slug || slug === 'detail.html' || slug === 'index.html') {
+        showError("URL atau kata kunci usaha tidak ditemukan.");
         return;
       }
 
       try {
-        const q = query(collection(db, "businesses"), where("slug", "==", slug));
-        const snap = await getDocs(q);
-        
+        const q = fQuery(fCollection(db, "businesses"), fWhere("slug", "==", slug));
+        const snap = await fGetDocs(q);
+
         if (snap.empty) {
-          showError("Usaha tidak ditemukan.");
+          showError("Usaha tidak ditemukan atau belum aktif.");
           return;
         }
-        
+
         const businessData = snap.docs[0].data();
         renderDetail(businessData);
         injectSEOMetadata(businessData);
-      } catch (err) { 
-        showError("Gagal memuat data dari database."); 
+      } catch (err) {
+        showError("Gagal mengambil data dari database: " + err.message);
       }
     });
 
