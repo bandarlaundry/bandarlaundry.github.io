@@ -16,8 +16,6 @@
   <meta id="og-image" property="og:image" content="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=1200&auto=format&fit=crop&q=80" />
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
-  <!-- HUBUNGKAN DENGAN STYLE.CSS -->
   <link rel="stylesheet" href="./style.css" />
 
   <script id="json-ld-schema" type="application/ld+json"></script>
@@ -31,7 +29,6 @@
     </div>
   </header>
 
-  <!-- SLOT IKLAN HALAMAN DETAIL: SETELAH HEADER -->
   <div id="ad-slot-detail-top" class="ad-slot-container"></div>
 
   <main class="container">
@@ -40,7 +37,6 @@
     </article>
   </main>
 
-  <!-- SLOT IKLAN HALAMAN DETAIL: SEBELUM FOOTER -->
   <div id="ad-slot-detail-bottom" class="ad-slot-container"></div>
 
   <footer>
@@ -60,7 +56,6 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
-  <!-- SCRIPT RENDER DETAIL DENGAN SCRIPT.JS BERSATU -->
   <script type="module">
     import { db } from "./script.js";
     import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -163,7 +158,6 @@
     }
   </script>
 
-  <!-- HUBUNGKAN DENGAN SCRIPT.JS UNTUK ADS & DARK MODE -->
   <script type="module" src="./script.js"></script>
 </body>
 </html>
