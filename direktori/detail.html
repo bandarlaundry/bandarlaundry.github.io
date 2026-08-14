@@ -54,27 +54,26 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- LEAFLET JS SCRIPT -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
-  <!-- MODUL LOGIKA DETAIL DENGAN FIRESTORE SDK PERBAIKAN -->
+  <!-- IMPOR SDK LENGKAP & DIPERBAIKI DARI FIREBASE-FIRESTORE.JS -->
   <script type="module">
     import { db } from "./script.js";
     import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // 1. Tangkap slug dari Query Parameter ?slug=xxx
-      const urlParams = new URLSearchParams(window.location.search);
-      let slug = urlParams.get("slug");
+      // BACA SLUG DARI URL PATHNAME (/category/city/slug)
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      let slug = parts[parts.length - 1];
 
-      // 2. Fallback tangkap dari Pathname jika diakses langsung
-      if (!slug) {
-        const parts = window.location.pathname.split('/').filter(Boolean);
-        slug = parts[parts.length - 1];
+      // Jika diakses dengan query parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("slug")) {
+        slug = urlParams.get("slug");
       }
 
-      if (!slug || slug === 'detail.html' || slug === 'index.html' || slug === '404.html') {
-        showError("URL atau kata kunci usaha tidak ditemukan.");
+      if (!slug || slug === 'index.html' || slug === '404.html' || slug === 'detail.html') {
+        showError("URL tidak valid.");
         return;
       }
 
@@ -126,7 +125,6 @@
         <div id="detail-map" style="height:280px; width:100%; border-radius:8px; border:1px solid var(--border); margin-top:0.5rem;"></div>
       `;
 
-      // Render Peta Leaflet & Invalidate Size
       if (b.latitude && b.longitude) {
         setTimeout(() => {
           const map = L.map('detail-map').setView([b.latitude, b.longitude], 15);
