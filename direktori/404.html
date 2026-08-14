@@ -4,29 +4,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title id="seo-title">Memuat Detail Usaha... — Laundry Directory V2.0</title>
+  <title id="seo-title">Memuat Detail Usaha... — Laundry Directory</title>
   <meta id="seo-desc" name="description" content="Lihat alamat lengkap, nomor WhatsApp, lokasi peta, dan layanan usaha kebersihan.">
   <link id="seo-canonical" rel="canonical" href="" />
 
-  <!-- OPEN GRAPH META FOR SOCIAL MEDIA SHARING -->
   <meta property="og:type" content="business.business" />
-  <meta property="og:site_name" content="Laundry Directory V2.0" />
+  <meta property="og:site_name" content="Laundry Directory" />
   <meta id="og-title" property="og:title" content="Memuat Detail Usaha..." />
   <meta id="og-desc" property="og:description" content="Informasi detail layanan laundry dan kebersihan." />
   <meta id="og-url" property="og:url" content="" />
   <meta id="og-image" property="og:image" content="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=1200&auto=format&fit=crop&q=80" />
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- PASTIKAN PATH CSS KE ROOT -->
-  <link rel="stylesheet" href="/style.css" id="main-css-link" />
+
+  <style>
+    :root { --header-bg: #1e3a8a; --header-text: #ffffff; --footer-bg: #f97316; --footer-text: #000000; --bg: #ffffff; --text: #000000; --border: #e5e7eb; --primary: #0284c7; }
+    body.dark-mode { --header-bg: #0f172a; --footer-bg: #c2410c; --footer-text: #ffffff; --bg: #0f172a; --text: #f8fafc; --border: #334155; }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    header { background: var(--header-bg); color: var(--header-text); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    header h1 a { color: var(--header-text); text-decoration: none; font-size: 1.25rem; font-weight: 700; }
+    
+    .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; flex: 1; width: 100%; }
+    .card { background: var(--bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
+    .badge { background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; width: fit-content; }
+    
+    .btn { padding: 0.8rem; border-radius: 6px; border: none; text-align: center; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-dark { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); }
+
+    .ad-slot-container { width: 100%; max-width: 800px; margin: 0.8rem auto; padding: 0 1rem; }
+    .ad-banner-link { display: block; width: 100%; border-radius: 8px; overflow: hidden; }
+    .ad-banner-img { width: 100%; height: auto; max-height: 180px; object-fit: cover; display: block; }
+
+    footer { background: var(--footer-bg); color: var(--footer-text); padding: 1.5rem 1rem; margin-top: auto; }
+  </style>
 
   <script id="json-ld-schema" type="application/ld+json"></script>
 </head>
 <body>
 
   <header>
-    <h1><a href="/" id="home-link">← Laundry Directory V2.0</a></h1>
-    <div class="header-actions">
+    <h1><a href="./" id="home-link">← Laundry Directory</a></h1>
+    <div>
       <button class="btn btn-dark" id="dark-mode-toggle">🌙 Mode Gelap</button>
     </div>
   </header>
@@ -42,65 +65,98 @@
   <div id="ad-slot-detail-bottom" class="ad-slot-container"></div>
 
   <footer>
-    <div class="footer-container">
-      <div class="footer-links">
-        <a href="/about.html" class="nav-link">Tentang Kami</a>
-        <a href="/contact.html" class="nav-link">Kontak</a>
-        <a href="/auth.html" class="nav-link">Login / Registrasi</a>
-      </div>
-      <div class="copyright">
-        &copy; <span id="current-year"></span> Laundry Directory V2.0. Hak Cipta Dilindungi.
-      </div>
+    <div style="text-align: center; font-size: 0.85rem;">
+      &copy; <span id="current-year"></span> Laundry Directory. Hak Cipta Dilindungi.
     </div>
   </footer>
-
-  <div class="toast" id="toast"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
   <script type="module">
-    import { db, getBasePath } from "/script.js";
-    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAY2JOM_GK_c8MIKOOROjG61XtC-VxF3Gc",
+      authDomain: "laundry-directory-1915d.firebaseapp.com",
+      projectId: "laundry-directory-1915d",
+      storageBucket: "laundry-directory-1915d.appspot.com",
+      messagingSenderId: "336437234560",
+      appId: "1:336437234560:web:69dc7cbb36704c9f614f65"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    function getBasePath() {
+      const path = window.location.pathname;
+      if (path.startsWith('/direktori')) return '/direktori';
+      const segments = path.split('/').filter(Boolean);
+      return window.location.hostname.includes('github.io') && segments.length > 0 ? '/' + segments[0] : '';
+    }
+
+    document.getElementById("current-year").innerText = new Date().getFullYear();
+
+    const darkToggle = document.getElementById("dark-mode-toggle");
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark-mode");
+      darkToggle.innerText = "☀️ Mode Terang";
+    }
+    darkToggle.onclick = () => {
+      document.body.classList.toggle("dark-mode");
+      const isDark = document.body.classList.contains("dark-mode");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      darkToggle.innerText = isDark ? "☀️ Mode Terang" : "🌙 Mode Gelap";
+    };
+
+    async function renderAds() {
+      try {
+        const snap = await getDocs(collection(db, "advertisements"));
+        const ads = [];
+        snap.forEach(d => ads.push({ id: d.id, ...d.data() }));
+
+        const slotDetailTop = document.getElementById("ad-slot-detail-top");
+        const slotDetailBottom = document.getElementById("ad-slot-detail-bottom");
+
+        if (slotDetailTop) slotDetailTop.innerHTML = "";
+        if (slotDetailBottom) slotDetailBottom.innerHTML = "";
+
+        ads.forEach(ad => {
+          if (!ad.imageUrl || !ad.linkUrl) return;
+          const adHtml = `<a href="${ad.linkUrl}" target="_blank" class="ad-banner-link"><img src="${ad.imageUrl}" class="ad-banner-img" alt="Iklan Banner"></a>`;
+          if (ad.placement === 'detail_top' && slotDetailTop) slotDetailTop.innerHTML = adHtml;
+          if (ad.placement === 'detail_bottom' && slotDetailBottom) slotDetailBottom.innerHTML = adHtml;
+        });
+      } catch (err) { console.error("Ad render error:", err); }
+    }
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // 1. SESUAIKAN RELATIVE PATH UNTUK GITHUB PAGES REPO SUBFOLDER
+      renderAds();
+
       const basePath = getBasePath();
-      
-      // Update link aset & navigasi agar sesuai nama repositori
-      const cssLink = document.getElementById("main-css-link");
-      if (cssLink && basePath) cssLink.href = `${basePath}/style.css`;
-      
       const homeLink = document.getElementById("home-link");
       if (homeLink) homeLink.href = `${basePath}/`;
 
-      document.querySelectorAll(".nav-link").forEach(el => {
-        const target = el.getAttribute("href");
-        if (target && basePath) el.href = `${basePath}${target}`;
-      });
-
-      // 2. PARSING SLUG DARI PATHNAME
-      // URL: /nama-repo/kategori/kota/slug-usaha ATAU /kategori/kota/slug-usaha
+      // BACA SEGMEN SLUG AKHIR DARI URL
       const pathSegments = window.location.pathname.split('/').filter(Boolean);
       let slug = pathSegments[pathSegments.length - 1];
 
-      // Fallback query string
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get("slug")) {
         slug = urlParams.get("slug");
       }
 
       if (!slug || slug === 'index.html' || slug === '404.html' || slug === 'detail.html') {
-        showError("URL tidak valid atau parameter slug tidak ditemukan.");
+        showError("URL tidak valid.");
         return;
       }
 
-      // 3. FETCH DATA DARI FIRESTORE BERDASARKAN SLUG
       try {
         const q = query(collection(db, "businesses"), where("slug", "==", slug));
         const snap = await getDocs(q);
 
         if (snap.empty) {
-          showError(`Usaha dengan kata kunci "${slug}" tidak ditemukan atau belum di-approve Admin.`);
+          showError(`Usaha "${slug}" tidak ditemukan atau belum disetujui Admin.`);
           return;
         }
 
@@ -108,8 +164,7 @@
         renderDetail(businessData);
         injectSEOMetadata(businessData);
       } catch (err) {
-        console.error("Firestore Error:", err);
-        showError("Gagal mengambil data dari database: " + err.message);
+        showError("Gagal mengambil data: " + err.message);
       }
     });
 
@@ -158,7 +213,7 @@
       const imgs = (b.images && b.images.length > 0) ? b.images : [b.imageUrl || 'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=1200'];
       const thumbUrl = imgs[0];
 
-      const pageTitle = `${b.name} ${b.city} — ${b.category} | Laundry Directory V2.0`;
+      const pageTitle = `${b.name} ${b.city} — ${b.category} | Laundry Directory`;
       const pageDesc = `${b.name} di ${b.city}, ${b.province || ''} melayani ${b.category}. Alamat: ${b.address}. Hubungi WhatsApp dan lihat lokasi peta.`;
 
       document.title = pageTitle;
@@ -197,13 +252,11 @@
     function showError(msg) {
       const basePath = getBasePath();
       document.getElementById("content").innerHTML = `
-        <h2 style="color:#ef4444;">Usaha Tidak Ditemukan (404)</h2>
-        <p style="margin-top:0.5rem; color:var(--text-muted);">${msg}</p>
+        <h2 style="color:#ef4444;">Usaha Tidak Ditemukan</h2>
+        <p style="margin-top:0.5rem;">${msg}</p>
         <a href="${basePath}/" class="btn btn-primary" style="width:fit-content; margin-top:1rem;">← Kembali ke Utama</a>
       `;
     }
   </script>
-
-  <script type="module" src="/script.js"></script>
 </body>
 </html>
