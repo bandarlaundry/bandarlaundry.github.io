@@ -246,14 +246,6 @@
 
     const INDONESIA_BOUNDS = L.latLngBounds(L.latLng(-11.1, 95.0), L.latLng(6.2, 141.0));
 
-    // GET BASE PATH DINAMIS KHUSUS SUBFOLDER /DIREKTORI/
-    function getBasePath() {
-      const path = window.location.pathname;
-      if (path.startsWith('/direktori')) return '/direktori';
-      const segments = path.split('/').filter(Boolean);
-      return window.location.hostname.includes('github.io') && segments.length > 0 ? '/' + segments[0] : '';
-    }
-
     function createSlug(text) {
       return text ? text.toString().toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '') : '';
     }
@@ -393,15 +385,14 @@
       if (!mainMarkersGroup) return;
       mainMarkersGroup.clearLayers();
       const bounds = [];
-      const basePath = getBasePath();
 
       filteredData.forEach(d => {
         if (d.latitude && d.longitude) {
           bounds.push([d.latitude, d.longitude]);
-          const catSlug = createSlug(d.category) || 'laundry';
-          const citySlug = createSlug(d.city) || 'lokasi';
-          const itemSlug = d.slug || createSlug(d.name);
-          const detailUrl = `${basePath}/${catSlug}/${citySlug}/${itemSlug}`;
+          
+          // FORMAT QUERY STRING (DIJAMIN TIDAK AKAN 404 DI SUBFOLDER)
+          const targetSlug = d.slug || createSlug(d.name);
+          const detailUrl = `./detail.html?slug=${targetSlug}`;
 
           const m = L.marker([d.latitude, d.longitude]);
           m.bindPopup(`<b>${d.name}</b><br>${d.category}<br>📍 ${d.city}<br><a href="${detailUrl}">Buka Detail</a>`);
@@ -415,7 +406,6 @@
     function renderList() {
       const listEl = document.getElementById("data-list");
       listEl.innerHTML = "";
-      const basePath = getBasePath();
 
       if (filteredData.length === 0) {
         listEl.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem;">Belum ada data usaha terdaftar.</div>`;
@@ -428,10 +418,9 @@
       const pageItems = filteredData.slice(start, start + PER_PAGE);
 
       pageItems.forEach(d => {
-        const catSlug = createSlug(d.category) || 'laundry';
-        const citySlug = createSlug(d.city) || 'lokasi';
-        const itemSlug = d.slug || createSlug(d.name);
-        const detailUrl = `${basePath}/${catSlug}/${citySlug}/${itemSlug}`;
+        // FORMAT QUERY STRING (DIJAMIN TIDAK AKAN 404 DI SUBFOLDER)
+        const targetSlug = d.slug || createSlug(d.name);
+        const detailUrl = `./detail.html?slug=${targetSlug}`;
 
         const canEdit = currentUser && (isAdminUser || (d.ownerId && d.ownerId === currentUser.uid));
         const defaultRandom = galleryImages.length > 0 ? galleryImages[Math.floor(Math.random() * galleryImages.length)] : "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=600";
