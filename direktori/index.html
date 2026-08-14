@@ -264,21 +264,8 @@
       renderList();
     }
 
-    function updateMapMarkers() {
-      if (!mainMarkersGroup) return;
-      mainMarkersGroup.clearLayers();
-      const bounds = [];
-      const basePath = getBasePath();
-
-      filteredData.forEach(d => {
-        if (d.latitude && d.longitude) {
-          bounds.push([d.latitude, d.longitude]);
-          const detailUrl = `${basePath}/detail.html?slug=${d.slug || createSlug(d.name)}`;
-          const m = L.marker([d.latitude, d.longitude]);
-          m.bindPopup(`<b>${d.name}</b><br>${d.category}<br>📍 ${d.city}<br><a href="${detailUrl}">Buka Detail</a>`);
-          mainMarkersGroup.addLayer(m);
-        }
-      });
+    // FORMAT URL SEO BERSIH (Bisa dibagikan dengan tampilan rapi)
+const detailUrl = `${basePath}/${createSlug(d.category)}/${createSlug(d.city || 'lokasi')}/${d.slug || createSlug(d.name)}`;
 
       if (bounds.length > 0 && mainMap) mainMap.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
     }
