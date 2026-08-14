@@ -8,7 +8,6 @@
   <meta id="seo-desc" name="description" content="Lihat alamat lengkap, nomor WhatsApp, lokasi peta, dan layanan usaha kebersihan.">
   <link id="seo-canonical" rel="canonical" href="" />
 
-  <!-- OPEN GRAPH / SOCIAL SHARING THUMBNAIL -->
   <meta property="og:type" content="business.business" />
   <meta property="og:site_name" content="Laundry Directory V2.0" />
   <meta id="og-title" property="og:title" content="Memuat Detail Usaha..." />
@@ -17,9 +16,7 @@
   <meta id="og-image" property="og:image" content="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=1200&auto=format&fit=crop&q=80" />
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
-  <!-- KUNCI SUKSES: MENGGUNAKAN RELATIVE-ROOT PATH AGAR TIDAK ERROR DI SUBFOLDER -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="./style.css" />
 
   <script id="json-ld-schema" type="application/ld+json"></script>
 </head>
@@ -59,16 +56,17 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
+  <!-- IMPOR SDK LENGKAP & DIPERBAIKI DARI FIREBASE-FIRESTORE.JS -->
   <script type="module">
     import { db } from "./script.js";
     import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // BACA SLUG DARI SEGMEN TERAKHIR URL PATHNAME (/category/city/slug)
+      // BACA SLUG DARI URL PATHNAME (/category/city/slug)
       const parts = window.location.pathname.split('/').filter(Boolean);
       let slug = parts[parts.length - 1];
 
-      // Jika diakses menggunakan query parameter fallback
+      // Jika diakses dengan query parameter
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get("slug")) {
         slug = urlParams.get("slug");
@@ -187,6 +185,6 @@
     }
   </script>
 
-  <script type="module" src="script.js"></script>
+  <script type="module" src="./script.js"></script>
 </body>
 </html>
