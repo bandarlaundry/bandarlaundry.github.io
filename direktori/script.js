@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, setDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, setDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAY2JOM_GK_c8MIKOOROjG61XtC-VxF3Gc",
@@ -15,7 +15,7 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-// FUNGSI GETBASEPATH() PORTABLE UNTUK GITHUB PAGES / LOCAL
+// Get BasePath Otomatis untuk GitHub Pages atau Server Lokal
 export function getBasePath() {
   const path = window.location.pathname;
   const segments = path.split('/').filter(Boolean);
@@ -26,6 +26,7 @@ export function getBasePath() {
 }
 
 export function createSlug(text) {
+  if (!text) return '';
   return text.toString().toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
 }
 
@@ -38,7 +39,7 @@ export function showToast(msg, type = "info") {
   setTimeout(() => { toast.style.display = "none"; }, 3500);
 }
 
-// RENDER IKLAN BANNER DINAMIS
+// Render Iklan Dinamis
 export async function renderAds() {
   try {
     const snap = await getDocs(collection(db, "advertisements"));
@@ -68,7 +69,6 @@ export async function renderAds() {
   }
 }
 
-// SETUP DOM GLOBAL & DARK MODE
 document.addEventListener("DOMContentLoaded", () => {
   renderAds();
 
