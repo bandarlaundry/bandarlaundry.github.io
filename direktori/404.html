@@ -8,6 +8,7 @@
   <meta id="seo-desc" name="description" content="Lihat alamat lengkap, nomor WhatsApp, lokasi peta, dan layanan usaha kebersihan.">
   <link id="seo-canonical" rel="canonical" href="" />
 
+  <!-- OPEN GRAPH / SOCIAL SHARING THUMBNAIL -->
   <meta property="og:type" content="business.business" />
   <meta property="og:site_name" content="Laundry Directory V2.0" />
   <meta id="og-title" property="og:title" content="Memuat Detail Usaha..." />
@@ -16,7 +17,9 @@
   <meta id="og-image" property="og:image" content="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=1200&auto=format&fit=crop&q=80" />
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="./style.css" />
+  
+  <!-- KUNCI SUKSES: MENGGUNAKAN RELATIVE-ROOT PATH AGAR TIDAK ERROR DI SUBFOLDER -->
+  <link rel="stylesheet" href="style.css" />
 
   <script id="json-ld-schema" type="application/ld+json"></script>
 </head>
@@ -54,27 +57,25 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- LEAFLET JS SCRIPT -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
-  <!-- MODUL LOGIKA DETAIL DENGAN FIRESTORE SDK PERBAIKAN -->
   <script type="module">
     import { db } from "./script.js";
     import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // 1. Tangkap slug dari Query Parameter ?slug=xxx
-      const urlParams = new URLSearchParams(window.location.search);
-      let slug = urlParams.get("slug");
+      // BACA SLUG DARI SEGMEN TERAKHIR URL PATHNAME (/category/city/slug)
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      let slug = parts[parts.length - 1];
 
-      // 2. Fallback tangkap dari Pathname jika diakses langsung
-      if (!slug) {
-        const parts = window.location.pathname.split('/').filter(Boolean);
-        slug = parts[parts.length - 1];
+      // Jika diakses menggunakan query parameter fallback
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("slug")) {
+        slug = urlParams.get("slug");
       }
 
-      if (!slug || slug === 'detail.html' || slug === 'index.html' || slug === '404.html') {
-        showError("URL atau kata kunci usaha tidak ditemukan.");
+      if (!slug || slug === 'index.html' || slug === '404.html' || slug === 'detail.html') {
+        showError("URL tidak valid.");
         return;
       }
 
@@ -126,7 +127,6 @@
         <div id="detail-map" style="height:280px; width:100%; border-radius:8px; border:1px solid var(--border); margin-top:0.5rem;"></div>
       `;
 
-      // Render Peta Leaflet & Invalidate Size
       if (b.latitude && b.longitude) {
         setTimeout(() => {
           const map = L.map('detail-map').setView([b.latitude, b.longitude], 15);
@@ -187,6 +187,6 @@
     }
   </script>
 
-  <script type="module" src="./script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
