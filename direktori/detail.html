@@ -61,18 +61,36 @@
     import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     document.addEventListener("DOMContentLoaded", async () => {
+      // BACA SLUG DARI URL PATHNAME
       const parts = window.location.pathname.split('/').filter(Boolean);
-      const slug = parts[parts.length - 1];
+      let slug = parts[parts.length - 1];
+
+      // JIKA URL MENGGUNAKAN QUERY PARAMETER (?slug=xxx)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("slug")) {
+        slug = urlParams.get("slug");
+      }
+
+      if (!slug || slug === 'index.html' || slug === '404.html') {
+        showError("URL tidak valid.");
+        return;
+      }
 
       try {
         const q = query(collection(db, "businesses"), where("slug", "==", slug));
         const snap = await getDocs(q);
-        if (snap.empty) { showError("Usaha tidak ditemukan."); return; }
+        
+        if (snap.empty) {
+          showError("Usaha tidak ditemukan.");
+          return;
+        }
         
         const businessData = snap.docs[0].data();
         renderDetail(businessData);
         injectSEOMetadata(businessData);
-      } catch (err) { showError("Gagal memuat data dari database."); }
+      } catch (err) { 
+        showError("Gagal memuat data dari database."); 
+      }
     });
 
     function renderDetail(b) {
@@ -82,7 +100,7 @@
       const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${b.latitude},${b.longitude}`;
 
       const imgs = (b.images && b.images.length > 0) ? b.images : [b.imageUrl || 'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=600'];
-      const galleryHtml = `<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.5rem;">${imgs.map(img => `<img src="${img}" style="width:100%; height:140px; object-fit:cover; border-radius:6px;" alt="${b.name}">`).join('')}</div>`;
+      const galleryHtml = `<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.5rem;">${imgs.map(img => `<img src="${img}" style="width:100%; height:160px; object-fit:cover; border-radius:6px;" alt="${b.name}">`).join('')}</div>`;
 
       document.getElementById("content").innerHTML = `
         ${galleryHtml}
