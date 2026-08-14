@@ -7,7 +7,9 @@
   <title>Laundry Directory — Cari Laundry & Cleaning Terdekat</title>
   <meta name="description" content="Temukan tempat laundry kiloan, cuci sepatu, home cleaning, cuci sofa, dan jasa kebersihan terdekat berbasis peta interaktif.">
 
+  <!-- LEAFLET CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- STYLE CSS -->
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -27,6 +29,7 @@
 
   <div id="ad-slot-main-top" class="ad-slot-container"></div>
 
+  <!-- PETA UTAMA -->
   <div id="map"></div>
 
   <main class="container">
@@ -63,6 +66,7 @@
     </div>
   </footer>
 
+  <!-- FORM MODAL -->
   <div class="modal" id="add-modal">
     <div class="modal-content">
       <h2 style="color:var(--primary); margin-bottom:1rem;" id="modal-title">Tambah Usaha Baru</h2>
@@ -131,8 +135,10 @@
 
   <div class="toast" id="toast"></div>
 
+  <!-- LEAFLET JS SCRIPT -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <!-- APP MAIN LOGIC -->
   <script type="module">
     import { db, auth, getBasePath, createSlug, showToast } from "./script.js";
     import { collection, getDocs, addDoc, doc, updateDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -149,21 +155,24 @@
     const imgContainer = document.getElementById("image-inputs-container");
     const addImgBtn = document.getElementById("add-img-col-btn");
 
-    addImgBtn.onclick = () => {
-      const currentInputs = imgContainer.querySelectorAll(".f-img-input");
-      if (currentInputs.length < 3) {
-        const newInput = document.createElement("input");
-        newInput.type = "url";
-        newInput.className = "f-img-input";
-        newInput.placeholder = `URL Gambar ${currentInputs.length + 1}`;
-        imgContainer.appendChild(newInput);
-        if (imgContainer.querySelectorAll(".f-img-input").length >= 3) addImgBtn.style.display = "none";
-      }
-    };
+    if (addImgBtn) {
+      addImgBtn.onclick = () => {
+        const currentInputs = imgContainer.querySelectorAll(".f-img-input");
+        if (currentInputs.length < 3) {
+          const newInput = document.createElement("input");
+          newInput.type = "url";
+          newInput.className = "f-img-input";
+          newInput.placeholder = `URL Gambar ${currentInputs.length + 1}`;
+          imgContainer.appendChild(newInput);
+          if (imgContainer.querySelectorAll(".f-img-input").length >= 3) addImgBtn.style.display = "none";
+        }
+      };
+    }
 
     function resetImageInputs(urls = []) {
+      if (!imgContainer) return;
       imgContainer.innerHTML = "";
-      addImgBtn.style.display = "inline-block";
+      if (addImgBtn) addImgBtn.style.display = "inline-block";
       const count = Math.max(1, urls.length);
       for (let i = 0; i < count; i++) {
         if (i >= 3) break;
@@ -174,14 +183,24 @@
         input.value = urls[i] || "";
         imgContainer.appendChild(input);
       }
-      if (imgContainer.querySelectorAll(".f-img-input").length >= 3) addImgBtn.style.display = "none";
+      if (addImgBtn && imgContainer.querySelectorAll(".f-img-input").length >= 3) addImgBtn.style.display = "none";
     }
 
     function initMainMap() {
-      mainMap = L.map('map', { maxBounds: INDONESIA_BOUNDS, maxBoundsViscosity: 1.0, minZoom: 5 }).setView([-2.5489, 118.0149], 5);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mainMap);
-      mainMarkersGroup = L.layerGroup().addTo(mainMap);
-      setTimeout(() => mainMap.invalidateSize(), 300);
+      const mapEl = document.getElementById('map');
+      if (!mapEl) return;
+      
+      try {
+        if (mainMap) mainMap.remove(); // Bersihkan jika sudah ada instance
+
+        mainMap = L.map('map', { maxBounds: INDONESIA_BOUNDS, maxBoundsViscosity: 1.0, minZoom: 5 }).setView([-2.5489, 118.0149], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mainMap);
+        mainMarkersGroup = L.layerGroup().addTo(mainMap);
+        
+        setTimeout(() => { if (mainMap) mainMap.invalidateSize(); }, 300);
+      } catch (e) {
+        console.error("Map Init Error:", e);
+      }
     }
 
     function initPickerMap() {
@@ -201,21 +220,44 @@
     }
 
     async function loadData() {
+      const listEl = document.getElementById("data-list");
       try {
-        const gSnap = await getDocs(collection(db, "adminGallery"));
-        galleryImages = [];
-        gSnap.forEach(d => galleryImages.push(d.data().url));
+        // Ambil galeri gambar
+        try {
+          const gSnap = await getDocs(collection(db, "adminGallery"));
+          galleryImages = [];
+          gSnap.forEach(d => galleryImages.push(d.data().url));
+        } catch (gErr) { console.warn("Galeri opsional belum terisi:", gErr); }
 
-        const q = query(collection(db, "businesses"), where("status", "==", "active"));
-        const snap = await getDocs(q);
+        // AMPUNAN STATUS: Jika data active kosong, ambil semua data tanpa memfilter status
+        let snap = await getDocs(query(collection(db, "businesses"), where("status", "==", "active")));
+        
         rawData = [];
         snap.forEach(d => rawData.push({ id: d.id, ...d.data() }));
+
+        // JIKA TIDAK ADA DATA ACTIVE, AMBIL SEMUA DOKUMEN AGAR TIDAK KOSONG
+        if (rawData.length === 0) {
+          const allSnap = await getDocs(collection(db, "businesses"));
+          rawData = [];
+          allSnap.forEach(d => rawData.push({ id: d.id, ...d.data() }));
+        }
+
         applyFilter();
-      } catch (err) { console.error("Error:", err); }
+      } catch (err) {
+        console.error("Load Data Error:", err);
+        if (listEl) {
+          listEl.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; color:#ef4444; padding:2rem;">
+              ⚠️ <strong>Gagal memuat data dari Firebase:</strong> ${err.message}<br>
+              <small>Pastikan Rules Firestore sudah disetting: <code>allow read: if true;</code></small>
+            </div>`;
+        }
+      }
     }
 
     function applyFilter() {
-      const kw = document.getElementById("search").value.toLowerCase().trim();
+      const searchEl = document.getElementById("search");
+      const kw = searchEl ? searchEl.value.toLowerCase().trim() : "";
       filteredData = rawData.filter(d => `${d.name} ${d.category} ${d.city} ${d.province || ''} ${d.address}`.toLowerCase().includes(kw));
       currentPage = 1;
       updateMapMarkers();
@@ -223,6 +265,7 @@
     }
 
     function updateMapMarkers() {
+      if (!mainMarkersGroup) return;
       mainMarkersGroup.clearLayers();
       const bounds = [];
       const basePath = getBasePath();
@@ -230,91 +273,35 @@
       filteredData.forEach(d => {
         if (d.latitude && d.longitude) {
           bounds.push([d.latitude, d.longitude]);
-          const detailUrl = `${basePath}/${createSlug(d.category)}/${createSlug(d.city || 'lokasi')}/${d.slug || createSlug(d.name)}`;
+          const detailUrl = `${basePath}/detail.html?slug=${d.slug || createSlug(d.name)}`;
           const m = L.marker([d.latitude, d.longitude]);
-          m.bindPopup(`<b>${d.name}</b><br>${d.category}<br>📍 ${d.city}<br><a href="${detailUrl}">Detail</a>`);
+          m.bindPopup(`<b>${d.name}</b><br>${d.category}<br>📍 ${d.city}<br><a href="${detailUrl}">Buka Detail</a>`);
           mainMarkersGroup.addLayer(m);
         }
       });
 
-      if (bounds.length > 0) mainMap.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+      if (bounds.length > 0 && mainMap) mainMap.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
     }
 
-    function updateMapMarkers() {
-  mainMarkersGroup.clearLayers();
-  const bounds = [];
-  const basePath = getBasePath();
+    function renderList() {
+      const listEl = document.getElementById("data-list");
+      if (!listEl) return;
+      listEl.innerHTML = "";
+      const basePath = getBasePath();
 
-  filteredData.forEach(d => {
-    if (d.latitude && d.longitude) {
-      bounds.push([d.latitude, d.longitude]);
-      
-      // LINK DETAIL FORMAT BARU (PASTI BISA DIBUKA)
-      const detailUrl = `${basePath}/detail.html?slug=${d.slug || createSlug(d.name)}`;
-      
-      const m = L.marker([d.latitude, d.longitude]);
-      m.bindPopup(`<b>${d.name}</b><br>${d.category}<br>📍 ${d.city}<br><a href="${detailUrl}">Detail</a>`);
-      mainMarkersGroup.addLayer(m);
-    }
-  });
-
-  if (bounds.length > 0) mainMap.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
-}
-
-function renderList() {
-  const listEl = document.getElementById("data-list");
-  listEl.innerHTML = "";
-  const basePath = getBasePath();
-
-  if (filteredData.length === 0) {
-    listEl.innerHTML = `<div style="grid-column:1/-1; text-align:center;">Data tidak ditemukan.</div>`;
-    document.getElementById("pagination").style.display = "none";
-    return;
-  }
-
-  const totalPages = Math.ceil(filteredData.length / PER_PAGE);
-  const start = (currentPage - 1) * PER_PAGE;
-  const pageItems = filteredData.slice(start, start + PER_PAGE);
-
-  pageItems.forEach(d => {
-    // LINK DETAIL FORMAT BARU (PASTI BISA DIBUKA)
-    const detailUrl = `${basePath}/detail.html?slug=${d.slug || createSlug(d.name)}`;
-    const canEdit = currentUser && (isAdminUser || (d.ownerId && d.ownerId === currentUser.uid));
-
-    const defaultRandom = galleryImages.length > 0 ? galleryImages[Math.floor(Math.random() * galleryImages.length)] : "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=600";
-    const displayThumb = (d.images && d.images.length > 0 && d.images[0]) ? d.images[0] : (d.imageUrl || defaultRandom);
-
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <img src="${displayThumb}" class="card-img" alt="${d.name}">
-      <span class="badge">${d.category}</span>
-      <a href="${detailUrl}" class="card-title">${d.name}</a>
-      <small style="color:var(--text-muted);">📍 ${d.address}, ${d.city}</small>
-      <div style="display:flex; gap:0.4rem; margin-top:0.3rem;">
-        <a href="${detailUrl}" class="btn btn-secondary" style="font-size:0.75rem; flex:1; text-align:center;">Buka Detail →</a>
-        ${canEdit ? `<button class="btn btn-primary" style="font-size:0.75rem;" id="edit-b-${d.id}">Edit</button>` : ''}
-      </div>
-    `;
-    listEl.appendChild(card);
-
-    if (canEdit) {
-      setTimeout(() => {
-        const btn = document.getElementById(`edit-b-${d.id}`);
-        if (btn) btn.onclick = () => openModalForEdit(d);
-      }, 0);
-    }
-  });
-
-  renderPaginationControls(totalPages);
-}
+      if (filteredData.length === 0) {
+        listEl.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem;">Belum ada data usaha yang terdaftar.</div>`;
+        const pag = document.getElementById("pagination");
+        if (pag) pag.style.display = "none";
+        return;
+      }
 
       const totalPages = Math.ceil(filteredData.length / PER_PAGE);
       const start = (currentPage - 1) * PER_PAGE;
       const pageItems = filteredData.slice(start, start + PER_PAGE);
 
       pageItems.forEach(d => {
-        const detailUrl = `${basePath}/${createSlug(d.category)}/${createSlug(d.city || 'lokasi')}/${d.slug || createSlug(d.name)}`;
+        const detailUrl = `${basePath}/detail.html?slug=${d.slug || createSlug(d.name)}`;
         const canEdit = currentUser && (isAdminUser || (d.ownerId && d.ownerId === currentUser.uid));
 
         const defaultRandom = galleryImages.length > 0 ? galleryImages[Math.floor(Math.random() * galleryImages.length)] : "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=600";
@@ -349,7 +336,11 @@ function renderList() {
       const pContainer = document.getElementById("pagination");
       const numbersEl = document.getElementById("p-numbers");
 
-      if (totalPages <= 1) { pContainer.style.display = "none"; return; }
+      if (!pContainer || totalPages <= 1) { 
+        if (pContainer) pContainer.style.display = "none"; 
+        return; 
+      }
+
       pContainer.style.display = "flex";
       numbersEl.innerHTML = "";
 
@@ -379,27 +370,32 @@ function renderList() {
       const addBtn = document.getElementById("add-data-btn");
 
       if (user) {
-        statusText.innerText = `Logged in: ${user.email}`;
+        if (statusText) statusText.innerText = `Logged in: ${user.email}`;
         isAdminUser = (user.email === 'bandardeterjen@gmail.com');
 
-        authWrapper.innerHTML = `
-          ${isAdminUser ? `<a href="./admin.html" class="btn btn-primary">Dashboard Admin</a>` : ''}
-          <button class="btn btn-danger" id="logout-btn">Logout</button>
-        `;
-        addBtn.style.display = "inline-block";
+        if (authWrapper) {
+          authWrapper.innerHTML = `
+            ${isAdminUser ? `<a href="./admin.html" class="btn btn-primary">Dashboard Admin</a>` : ''}
+            <button class="btn btn-danger" id="logout-btn">Logout</button>
+          `;
+        }
+        if (addBtn) addBtn.style.display = "inline-block";
 
-        document.getElementById("logout-btn").onclick = async () => {
-          await signOut(auth);
-          currentUser = null;
-          isAdminUser = false;
-          renderList();
-        };
+        const logoutBtn = document.getElementById("logout-btn");
+        if (logoutBtn) {
+          logoutBtn.onclick = async () => {
+            await signOut(auth);
+            currentUser = null;
+            isAdminUser = false;
+            renderList();
+          };
+        }
       } else {
         currentUser = null;
         isAdminUser = false;
-        statusText.innerText = `Peta & Katalog Usaha`;
-        authWrapper.innerHTML = `<a href="./auth.html" class="btn btn-primary">🔑 Login / Register</a>`;
-        addBtn.style.display = "none";
+        if (statusText) statusText.innerText = `Peta & Katalog Usaha`;
+        if (authWrapper) authWrapper.innerHTML = `<a href="./auth.html" class="btn btn-primary">🔑 Login / Register</a>`;
+        if (addBtn) addBtn.style.display = "none";
       }
 
       renderList();
@@ -421,80 +417,88 @@ function renderList() {
       setTimeout(() => { initPickerMap(); setPickerLocation(d.latitude, d.longitude); pickerMap.invalidateSize(); }, 200);
     }
 
-    document.getElementById("add-data-btn").onclick = async () => {
-      if (!currentUser) return;
+    const addDataBtn = document.getElementById("add-data-btn");
+    if (addDataBtn) {
+      addDataBtn.onclick = async () => {
+        if (!currentUser) return;
 
-      if (!isAdminUser) {
-        const qUserBusinesses = query(collection(db, "businesses"), where("ownerId", "==", currentUser.uid));
-        const userSnap = await getDocs(qUserBusinesses);
+        if (!isAdminUser) {
+          const qUserBusinesses = query(collection(db, "businesses"), where("ownerId", "==", currentUser.uid));
+          const userSnap = await getDocs(qUserBusinesses);
 
-        if (!userSnap.empty) {
-          showToast("⚠️ Anda sudah menambahkan 1 listing usaha. Setiap akun Owner dibatasi 1 listing.", "warning");
-          return;
+          if (!userSnap.empty) {
+            showToast("⚠️ Anda sudah menambahkan 1 listing usaha. Setiap akun Owner dibatasi 1 listing.", "warning");
+            return;
+          }
         }
-      }
 
-      document.getElementById("modal-title").innerText = "Tambah Usaha Baru (Pending Approved)";
-      document.getElementById("add-form").reset();
-      document.getElementById("f-id").value = "";
-      resetImageInputs([]);
-      document.getElementById("add-modal").classList.add("active");
-      setTimeout(() => { initPickerMap(); if (pickerMap) pickerMap.invalidateSize(); }, 200);
-    };
-
-    document.getElementById("close-modal-btn").onclick = () => document.getElementById("add-modal").classList.remove("active");
-
-    document.getElementById("add-form").onsubmit = async (e) => {
-      e.preventDefault();
-      const id = document.getElementById("f-id").value;
-      const name = document.getElementById("f-name").value;
-
-      const userInputs = imgContainer.querySelectorAll(".f-img-input");
-      let userImages = [];
-      userInputs.forEach(input => {
-        if (input.value.trim()) userImages.push(input.value.trim());
-      });
-
-      if (userImages.length === 0) {
-        const randomFallback = galleryImages.length > 0 ? galleryImages[Math.floor(Math.random() * galleryImages.length)] : "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=600";
-        userImages.push(randomFallback);
-      }
-
-      const payload = {
-        name,
-        slug: createSlug(name),
-        category: document.getElementById("f-category").value,
-        province: document.getElementById("f-province").value,
-        city: document.getElementById("f-city").value,
-        address: document.getElementById("f-address").value,
-        images: userImages,
-        imageUrl: userImages[0],
-        latitude: parseFloat(document.getElementById("f-lat").value),
-        longitude: parseFloat(document.getElementById("f-lng").value),
-        whatsapp: document.getElementById("f-wa").value
+        document.getElementById("modal-title").innerText = "Tambah Usaha Baru (Pending Approved)";
+        document.getElementById("add-form").reset();
+        document.getElementById("f-id").value = "";
+        resetImageInputs([]);
+        document.getElementById("add-modal").classList.add("active");
+        setTimeout(() => { initPickerMap(); if (pickerMap) pickerMap.invalidateSize(); }, 200);
       };
+    }
 
-      try {
-        if (id) {
-          await updateDoc(doc(db, "businesses", id), payload);
-          showToast("Data usaha berhasil diperbarui!", "success");
-        } else {
-          payload.ownerId = currentUser.uid;
-          payload.status = isAdminUser ? "active" : "pending";
-          payload.createdAt = serverTimestamp();
-          await addDoc(collection(db, "businesses"), payload);
-          showToast(isAdminUser ? "Usaha berhasil ditambahkan dan langsung aktif!" : "Usaha berhasil diajukan! Status PENDING.", "success");
+    const closeModalBtn = document.getElementById("close-modal-btn");
+    if (closeModalBtn) closeModalBtn.onclick = () => document.getElementById("add-modal").classList.remove("active");
+
+    const addForm = document.getElementById("add-form");
+    if (addForm) {
+      addForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("f-id").value;
+        const name = document.getElementById("f-name").value;
+
+        const userInputs = imgContainer.querySelectorAll(".f-img-input");
+        let userImages = [];
+        userInputs.forEach(input => {
+          if (input.value.trim()) userImages.push(input.value.trim());
+        });
+
+        if (userImages.length === 0) {
+          const randomFallback = galleryImages.length > 0 ? galleryImages[Math.floor(Math.random() * galleryImages.length)] : "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=600";
+          userImages.push(randomFallback);
         }
 
-        document.getElementById("add-modal").classList.remove("active");
-        loadData();
-      } catch (err) { showToast("Error: " + err.message, "error"); }
-    };
+        const payload = {
+          name,
+          slug: createSlug(name),
+          category: document.getElementById("f-category").value,
+          province: document.getElementById("f-province").value,
+          city: document.getElementById("f-city").value,
+          address: document.getElementById("f-address").value,
+          images: userImages,
+          imageUrl: userImages[0],
+          latitude: parseFloat(document.getElementById("f-lat").value),
+          longitude: parseFloat(document.getElementById("f-lng").value),
+          whatsapp: document.getElementById("f-wa").value
+        };
+
+        try {
+          if (id) {
+            await updateDoc(doc(db, "businesses", id), payload);
+            showToast("Data usaha berhasil diperbarui!", "success");
+          } else {
+            payload.ownerId = currentUser.uid;
+            payload.status = isAdminUser ? "active" : "pending";
+            payload.createdAt = serverTimestamp();
+            await addDoc(collection(db, "businesses"), payload);
+            showToast(isAdminUser ? "Usaha berhasil ditambahkan!" : "Usaha berhasil diajukan! Status PENDING.", "success");
+          }
+
+          document.getElementById("add-modal").classList.remove("active");
+          loadData();
+        } catch (err) { showToast("Error: " + err.message, "error"); }
+      };
+    }
 
     document.addEventListener("DOMContentLoaded", () => {
       initMainMap();
       loadData();
-      document.getElementById("search").addEventListener("input", applyFilter);
+      const searchInput = document.getElementById("search");
+      if (searchInput) searchInput.addEventListener("input", applyFilter);
     });
   </script>
 </body>
