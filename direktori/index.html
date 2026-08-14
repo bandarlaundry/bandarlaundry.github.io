@@ -7,9 +7,7 @@
   <title>Laundry Directory — Cari Laundry & Cleaning Terdekat</title>
   <meta name="description" content="Temukan tempat laundry kiloan, cuci sepatu, home cleaning, cuci sofa, dan jasa kebersihan terdekat berbasis peta interaktif.">
 
-  <!-- LEAFLET CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- STYLE CSS -->
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -29,7 +27,6 @@
 
   <div id="ad-slot-main-top" class="ad-slot-container"></div>
 
-  <!-- PETA UTAMA -->
   <div id="map"></div>
 
   <main class="container">
@@ -66,7 +63,6 @@
     </div>
   </footer>
 
-  <!-- FORM MODAL -->
   <div class="modal" id="add-modal">
     <div class="modal-content">
       <h2 style="color:var(--primary); margin-bottom:1rem;" id="modal-title">Tambah Usaha Baru</h2>
@@ -135,10 +131,8 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- LEAFLET JS SCRIPT -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- APP MAIN LOGIC -->
   <script type="module">
     import { db, auth, getBasePath, createSlug, showToast } from "./script.js";
     import { collection, getDocs, addDoc, doc, updateDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -191,16 +185,13 @@
       if (!mapEl) return;
       
       try {
-        if (mainMap) mainMap.remove(); // Bersihkan jika sudah ada instance
-
+        if (mainMap) mainMap.remove();
         mainMap = L.map('map', { maxBounds: INDONESIA_BOUNDS, maxBoundsViscosity: 1.0, minZoom: 5 }).setView([-2.5489, 118.0149], 5);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mainMap);
         mainMarkersGroup = L.layerGroup().addTo(mainMap);
         
         setTimeout(() => { if (mainMap) mainMap.invalidateSize(); }, 300);
-      } catch (e) {
-        console.error("Map Init Error:", e);
-      }
+      } catch (e) { console.error("Map Init Error:", e); }
     }
 
     function initPickerMap() {
@@ -222,20 +213,18 @@
     async function loadData() {
       const listEl = document.getElementById("data-list");
       try {
-        // Ambil galeri gambar
         try {
           const gSnap = await getDocs(collection(db, "adminGallery"));
           galleryImages = [];
           gSnap.forEach(d => galleryImages.push(d.data().url));
-        } catch (gErr) { console.warn("Galeri opsional belum terisi:", gErr); }
+        } catch (gErr) { console.warn("Galeri opsional:", gErr); }
 
-        // AMPUNAN STATUS: Jika data active kosong, ambil semua data tanpa memfilter status
+        // Ambil data aktif
         let snap = await getDocs(query(collection(db, "businesses"), where("status", "==", "active")));
-        
         rawData = [];
         snap.forEach(d => rawData.push({ id: d.id, ...d.data() }));
 
-        // JIKA TIDAK ADA DATA ACTIVE, AMBIL SEMUA DOKUMEN AGAR TIDAK KOSONG
+        // Fallback jika belum ada data active
         if (rawData.length === 0) {
           const allSnap = await getDocs(collection(db, "businesses"));
           rawData = [];
@@ -246,11 +235,7 @@
       } catch (err) {
         console.error("Load Data Error:", err);
         if (listEl) {
-          listEl.innerHTML = `
-            <div style="grid-column:1/-1; text-align:center; color:#ef4444; padding:2rem;">
-              ⚠️ <strong>Gagal memuat data dari Firebase:</strong> ${err.message}<br>
-              <small>Pastikan Rules Firestore sudah disetting: <code>allow read: if true;</code></small>
-            </div>`;
+          listEl.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#ef4444; padding:2rem;">⚠️ Gagal memuat data: ${err.message}</div>`;
         }
       }
     }
@@ -264,8 +249,27 @@
       renderList();
     }
 
-    // FORMAT URL SEO BERSIH (Bisa dibagikan dengan tampilan rapi)
-const detailUrl = `${basePath}/${createSlug(d.category)}/${createSlug(d.city || 'lokasi')}/${d.slug || createSlug(d.name)}`;
+    function updateMapMarkers() {
+      if (!mainMarkersGroup) return;
+      mainMarkersGroup.clearLayers();
+      const bounds = [];
+      const basePath = getBasePath();
+
+      filteredData.forEach(d => {
+        if (d.latitude && d.longitude) {
+          bounds.push([d.latitude, d.longitude]);
+          
+          // REFACTOR: PEMBENTUKAN URL SEO BERSIH
+          const catSlug = createSlug(d.category) || 'laundry';
+          const citySlug = createSlug(d.city) || 'lokasi';
+          const itemSlug = d.slug || createSlug(d.name);
+          const detailUrl = `${basePath}/${catSlug}/${citySlug}/${itemSlug}`;
+
+          const m = L.marker([d.latitude, d.longitude]);
+          m.bindPopup(`<b>${d.name}</b><br>${d.category}<br>📍 ${d.city}<br><a href="${detailUrl}">Buka Detail</a>`);
+          mainMarkersGroup.addLayer(m);
+        }
+      });
 
       if (bounds.length > 0 && mainMap) mainMap.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
     }
@@ -277,7 +281,7 @@ const detailUrl = `${basePath}/${createSlug(d.category)}/${createSlug(d.city || 
       const basePath = getBasePath();
 
       if (filteredData.length === 0) {
-        listEl.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem;">Belum ada data usaha yang terdaftar.</div>`;
+        listEl.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem;">Belum ada data usaha terdaftar.</div>`;
         const pag = document.getElementById("pagination");
         if (pag) pag.style.display = "none";
         return;
@@ -288,7 +292,12 @@ const detailUrl = `${basePath}/${createSlug(d.category)}/${createSlug(d.city || 
       const pageItems = filteredData.slice(start, start + PER_PAGE);
 
       pageItems.forEach(d => {
-        const detailUrl = `${basePath}/detail.html?slug=${d.slug || createSlug(d.name)}`;
+        // REFACTOR: PEMBENTUKAN URL SEO BERSIH
+        const catSlug = createSlug(d.category) || 'laundry';
+        const citySlug = createSlug(d.city) || 'lokasi';
+        const itemSlug = d.slug || createSlug(d.name);
+        const detailUrl = `${basePath}/${catSlug}/${citySlug}/${itemSlug}`;
+
         const canEdit = currentUser && (isAdminUser || (d.ownerId && d.ownerId === currentUser.uid));
 
         const defaultRandom = galleryImages.length > 0 ? galleryImages[Math.floor(Math.random() * galleryImages.length)] : "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=600";
@@ -414,7 +423,7 @@ const detailUrl = `${basePath}/${createSlug(d.category)}/${createSlug(d.city || 
           const userSnap = await getDocs(qUserBusinesses);
 
           if (!userSnap.empty) {
-            showToast("⚠️ Anda sudah menambahkan 1 listing usaha. Setiap akun Owner dibatasi 1 listing.", "warning");
+            showToast("⚠️ Anda sudah menambahkan 1 listing usaha.", "warning");
             return;
           }
         }
@@ -472,7 +481,7 @@ const detailUrl = `${basePath}/${createSlug(d.category)}/${createSlug(d.city || 
             payload.status = isAdminUser ? "active" : "pending";
             payload.createdAt = serverTimestamp();
             await addDoc(collection(db, "businesses"), payload);
-            showToast(isAdminUser ? "Usaha berhasil ditambahkan!" : "Usaha berhasil diajukan! Status PENDING.", "success");
+            showToast(isAdminUser ? "Usaha berhasil ditambahkan!" : "Usaha berhasil diajukan!", "success");
           }
 
           document.getElementById("add-modal").classList.remove("active");
