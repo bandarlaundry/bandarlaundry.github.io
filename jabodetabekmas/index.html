@@ -200,7 +200,7 @@
     /* Wilayah Grid Khusus Halaman Utama */
     .wilayah-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
       margin-top: 24px;
     }
@@ -242,9 +242,9 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-top: 12px;
+      margin-top: 8px;
       border-top: 1px solid var(--border);
-      padding-top: 12px;
+      padding-top: 10px;
     }
     .wilayah-card .kec-tag {
       background: var(--primary-lt);
@@ -254,6 +254,7 @@
       font-size: .72rem;
       font-weight: 600;
       transition: .2s;
+      white-space: nowrap;
     }
     .wilayah-card .kec-tag:hover {
       background: var(--primary);
@@ -267,6 +268,7 @@
       font-size: .68rem;
       font-weight: 600;
       transition: .2s;
+      white-space: nowrap;
     }
     .wilayah-card .desa-tag-mini:hover {
       background: var(--orange);
@@ -354,7 +356,8 @@
   <script>
     // ================== KONFIGURASI ==================
     const MODULE = 'laundry';
-    const MPCONFIG_CSV_URL = "mpconfig.csv";
+    // Gunakan file eksternal untuk konfigurasi nomor telepon
+    const MPCONFIG_JS_URL = "https://bandarlaundry.github.io/js/dataPhone.js";
 
     const CSV_URLS = {
       districts: "https://raw.githubusercontent.com/prodhokter/dataset-wilayah-indonesia/master/districts.csv",
@@ -395,7 +398,7 @@
       villagesLoaded: false
     };
 
-    const MPCONFIG = { phoneBySlug: new Map(), defaultPhone: "085773009666" };
+    const MPCONFIG = { phoneBySlug: new Map(), defaultPhone: null };
 
     // ================== UTILITY ==================
     function slugify(str) {
@@ -426,47 +429,37 @@
       return text.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
     }
 
-    // ================== LOAD MPCONFIG ==================
+    // ================== LOAD MPCONFIG DARI JS EKSTERNAL ==================
     async function loadMpConfig() {
       try {
-        const lines = await fetchCsvLines(MPCONFIG_CSV_URL);
-        lines.forEach(function (line, idx) {
-          if (idx === 0 && line.toLowerCase().indexOf('slug') === 0) return;
-          const comma = line.indexOf(',');
-          if (comma === -1) return;
-          const slug = line.slice(0, comma).trim().toLowerCase();
-          const phone = line.slice(comma + 1).trim();
-          if (!slug || !phone) return;
-          if (slug === 'default') {
-            MPCONFIG.defaultPhone = phone;
-          } else {
-            MPCONFIG.phoneBySlug.set(slug, phone);
+        // Load dataPhone.js sebagai module
+        const script = await import(MPCONFIG_JS_URL);
+        // Ekspektasi: file mengekspor object dengan properti phoneBySlug dan defaultPhone
+        if (script && typeof script === 'object') {
+          if (script.defaultPhone) {
+            MPCONFIG.defaultPhone = script.defaultPhone;
           }
-        });
+          if (script.phoneBySlug && typeof script.phoneBySlug === 'object') {
+            Object.keys(script.phoneBySlug).forEach(function(key) {
+              MPCONFIG.phoneBySlug.set(key, script.phoneBySlug[key]);
+            });
+          }
+          // Jika berhasil load, return
+          if (MPCONFIG.defaultPhone) {
+            return;
+          }
+        }
+        throw new Error('Data phone tidak lengkap');
       } catch (err) {
-        console.warn("Gagal memuat mpconfig.csv, menggunakan nomor fallback bawaan.", err);
-        MPCONFIG.defaultPhone = "085773009666";
-        MPCONFIG.phoneBySlug = new Map([
-          ["jakarta-selatan", "085773009666"],
-          ["jakarta-timur", "085773009666"],
-          ["jakarta-pusat", "085773009666"],
-          ["jakarta-barat", "085773009666"],
-          ["jakarta-utara", "088808181008"],
-          ["kabupaten-bogor", "085773009666"],
-          ["kota-bogor", "085773009666"],
-          ["kota-depok", "085773009666"],
-          ["kota-tangerang", "085773009666"],
-          ["kota-tangerang-selatan", "085773009666"],
-          ["kabupaten-tangerang", "085773009666"],
-          ["kota-bekasi", "085773009666"],
-          ["kabupaten-bekasi", "085773009666"],
-          ["kabupaten-banyumas", "085773009666"]
-        ]);
+        console.error('Gagal memuat dataPhone.js:', err);
+        throw new Error('Gagal memuat konfigurasi nomor telepon dari ' + MPCONFIG_JS_URL);
       }
     }
 
     function getActivePhone(regionSlug) {
-      if (regionSlug && MPCONFIG.phoneBySlug.has(regionSlug)) return MPCONFIG.phoneBySlug.get(regionSlug);
+      if (regionSlug && MPCONFIG.phoneBySlug.has(regionSlug)) {
+        return MPCONFIG.phoneBySlug.get(regionSlug);
+      }
       return MPCONFIG.defaultPhone;
     }
 
@@ -529,11 +522,62 @@
 
     window.addEventListener('hashchange', renderRoute);
 
-    function updateSEO(title, desc, relativeSlug) {
-      document.title = title;
-      const pt = document.getElementById('page-title'); if (pt) pt.innerText = title;
+    function buildTitle(regionSlug, districtSlug, desaName, phone) {
+      let titleParts = [];
+      let pathParts = [];
+
+      if (regionSlug) {
+        const region = findRegionBySlug(regionSlug);
+        if (region) {
+          pathParts.push(region.slug);
+          titleParts.push(region.name);
+        }
+      }
+      if (districtSlug && regionSlug) {
+        const region = findRegionBySlug(regionSlug);
+        if (region) {
+          const district = findDistrictBySlug(region.id, districtSlug);
+          if (district) {
+            pathParts.push(district.slug);
+            titleParts.push(district.name);
+          }
+        }
+      }
+      if (desaName) {
+        pathParts.push(slugify(desaName));
+        titleParts.push(desaName);
+      }
+
+      const pathStr = pathParts.join('/');
+      const titleStr = titleParts.join(', ');
+
+      let fullTitle = '';
+      if (pathStr) {
+        fullTitle += '#' + MODULE + '/' + pathStr + ' ';
+      }
+      if (phone) {
+        fullTitle += phone + ' ';
+      }
+      if (titleStr) {
+        fullTitle += 'Laundry Kiloan ' + titleStr + ' – Laundry Listing';
+      } else {
+        fullTitle = 'Laundry Listing – Jasa Laundry Kiloan & Express Jabodetabek & Banyumas';
+      }
+      return fullTitle;
+    }
+
+    function updateSEO(title, desc, relativeSlug, phone) {
+      // Pastikan title mengandung nomor telepon
+      let finalTitle = title;
+      if (phone && !title.includes(phone)) {
+        // Jika title belum mengandung nomor, tambahkan di depan
+        const hashPart = relativeSlug ? ('#' + MODULE + '/' + relativeSlug + ' ') : '# ';
+        finalTitle = hashPart + phone + ' ' + title.replace(/^#laundry\/[^ ]+ /, '');
+      }
+      document.title = finalTitle;
+      const pt = document.getElementById('page-title'); if (pt) pt.innerText = finalTitle;
       const pd = document.getElementById('page-desc'); if (pd) pd.setAttribute('content', desc);
-      const ot = document.getElementById('og-title'); if (ot) ot.setAttribute('content', title);
+      const ot = document.getElementById('og-title'); if (ot) ot.setAttribute('content', finalTitle);
       const od = document.getElementById('og-desc'); if (od) od.setAttribute('content', desc);
       const fullUrl = window.location.origin + window.location.pathname + hashUrl(relativeSlug);
       const pc = document.getElementById('page-canonical'); if (pc) pc.setAttribute('href', fullUrl);
@@ -546,6 +590,7 @@
     }
 
     function buildWaHref(phone, text) {
+      if (!phone) return '#';
       const target = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
       return 'https://wa.me/' + target + '?text=' + encodeURIComponent(text);
     }
@@ -559,32 +604,32 @@
       return parts.slice(1);
     }
 
-    // ================== RENDER HOME (WILAYAH FOCUS) ==================
+    // ================== RENDER HOME ==================
     function renderHomePage() {
       let regionCardsHtml = '';
 
       TARGET_REGIONS.forEach(function (region) {
         const distList = WILAYAH.districtsByRegency.get(region.id) || [];
-        const displayKec = distList.slice(0, 5);
-        const extraKec = distList.length - 5;
-
-        // Ambil 3 desa pertama dari kecamatan pertama sebagai preview
-        let previewDesa = [];
-        if (distList.length > 0) {
-          const firstDist = distList[0];
-          const desaList = WILAYAH.villagesByDistrict.get(firstDist.id) || [];
-          previewDesa = desaList.slice(0, 3);
-        }
-
-        const kecHtml = displayKec.map(function (d) {
+        // Tampilkan SEMUA kecamatan, tidak dipotong
+        const kecHtml = distList.map(function (d) {
           return '<span class="kec-tag">' + d.name + '</span>';
         }).join('');
+
+        // Ambil 5 desa pertama dari setiap kecamatan sebagai preview (tidak semua agar tidak terlalu panjang)
+        let previewDesa = [];
+        distList.forEach(function (dist) {
+          const desaList = WILAYAH.villagesByDistrict.get(dist.id) || [];
+          // Ambil max 2 desa per kecamatan untuk preview
+          const sample = desaList.slice(0, 2);
+          previewDesa = previewDesa.concat(sample);
+          if (previewDesa.length >= 10) return; // batasi total preview
+        });
+        // Potong jika terlalu banyak
+        if (previewDesa.length > 10) previewDesa = previewDesa.slice(0, 10);
 
         const desaHtml = previewDesa.map(function (d) {
           return '<span class="desa-tag-mini">' + d + '</span>';
         }).join('');
-
-        const extraHtml = extraKec > 0 ? '<span class="kec-tag">+' + extraKec + ' kecamatan</span>' : '';
 
         regionCardsHtml +=
           '<div class="wilayah-card" onclick="navigate(event, \'' + region.slug + '\')">' +
@@ -597,7 +642,6 @@
             '</div>' +
             '<div class="wilayah-kecamatan">' +
               kecHtml +
-              extraHtml +
             '</div>' +
             (previewDesa.length > 0 ? '<div class="wilayah-kecamatan" style="border-top-color: var(--orange);">' + desaHtml + '</div>' : '') +
             '<span class="lihat-semua">Lihat semua kecamatan →</span>' +
@@ -605,6 +649,8 @@
       });
 
       const totalDistricts = Array.from(WILAYAH.districtsByRegency.values()).reduce(function (sum, arr) { return sum + arr.length; }, 0);
+
+      const phone = MPCONFIG.defaultPhone || '085773009666';
 
       return (
         '<section id="hero">' +
@@ -615,7 +661,7 @@
                 '<h1 class="hero-title">Jasa Laundry Kiloan &amp; Express <span class="hl-orange">Laundry Listing</span></h1>' +
                 '<p class="hero-sub">Layanan laundry profesional dengan standar higienis tinggi, detergen premium, pemisahan warna ketat, dan gratis antar-jemput di Jakarta, Bogor, Depok, Tangerang, Bekasi, dan Banyumas.</p>' +
                 '<div class="hero-cta-group">' +
-                  '<a href="' + buildWaHref(MPCONFIG.defaultPhone, 'Halo Laundry Listing, saya mau order') + '" target="_blank" class="btn btn-wa btn-lg">💬 Pesan Sekarang</a>' +
+                  '<a href="' + buildWaHref(phone, 'Halo Laundry Listing, saya mau order') + '" target="_blank" class="btn btn-wa btn-lg">💬 Pesan Sekarang</a>' +
                   '<a href="#area-layanan" class="btn btn-outline">Pilih Wilayah ↓</a>' +
                 '</div>' +
               '</div>' +
@@ -668,7 +714,7 @@
         '</section>' +
 
         renderFAQSection() +
-        renderCTASection(MPCONFIG.defaultPhone, "Cucian Menumpuk di Rumah?", "Serahkan pada Laundry Listing, beres tanpa repot. Mulai " + PRICING.defaultPricePerKg + "/kg.")
+        renderCTASection(phone, "Cucian Menumpuk di Rumah?", "Serahkan pada Laundry Listing, beres tanpa repot. Mulai " + PRICING.defaultPricePerKg + "/kg.")
       );
     }
 
@@ -992,7 +1038,7 @@
     }
 
     function renderFAQSection() {
-      const jakartaPhone = getActivePhone('jakarta-selatan');
+      const jakartaPhone = getActivePhone('jakarta-selatan') || MPCONFIG.defaultPhone;
       const lainnyaPhone = MPCONFIG.defaultPhone;
       return (
         '<section class="section section-alt" id="faq">' +
@@ -1068,11 +1114,10 @@
       if (params === null) { render404(); return; }
 
       if (params.length === 0) {
-        updateSEO(
-          "Laundry Listing – Jasa Laundry Kiloan & Express Jabodetabek & Banyumas",
-          "Laundry Listing: Jasa laundry kiloan dan express terpercaya di Jakarta, Bogor, Depok, Tangerang, Bekasi, dan Banyumas. Mulai " + PRICING.defaultPricePerKg + "/kg, antar jemput gratis.",
-          ""
-        );
+        const phone = MPCONFIG.defaultPhone || '085773009666';
+        const title = "Laundry Listing – Jasa Laundry Kiloan & Express Jabodetabek & Banyumas";
+        const desc = "Laundry Listing: Jasa laundry kiloan dan express terpercaya di Jakarta, Bogor, Depok, Tangerang, Bekasi, dan Banyumas. Mulai " + PRICING.defaultPricePerKg + "/kg, antar jemput gratis.";
+        updateSEO(title, desc, "", phone);
         app.innerHTML = renderHomePage();
         initFAQ();
         return;
@@ -1083,11 +1128,9 @@
       const phone = getActivePhone(region.slug);
 
       if (params.length === 1) {
-        updateSEO(
-          "Laundry Listing " + region.name + " – Direktori Laundry Kiloan Per Kecamatan",
-          "Layanan laundry kiloan terpercaya di seluruh " + region.name + ". Mulai " + PRICING.defaultPricePerKg + "/kg, melayani semua kecamatan.",
-          region.slug
-        );
+        const title = "Laundry Listing " + region.name + " – Direktori Laundry Kiloan Per Kecamatan";
+        const desc = "Layanan laundry kiloan terpercaya di seluruh " + region.name + ". Mulai " + PRICING.defaultPricePerKg + "/kg, melayani semua kecamatan.";
+        updateSEO(title, desc, region.slug, phone);
         app.innerHTML = renderRegionPage(phone, region);
         initFAQ();
         return;
@@ -1100,11 +1143,9 @@
         showLoading('Memuat data desa/kelurahan di ' + district.name + '…');
         await loadVillages();
         const desaList = WILAYAH.villagesByDistrict.get(district.id) || [];
-        updateSEO(
-          "Laundry Kiloan " + district.name + " – Bersih & Wangi | Laundry Listing " + region.name,
-          "Laundry kiloan di " + district.name + ", " + region.name + ". Mulai " + PRICING.defaultPricePerKg + "/kg, express 6 jam, antar jemput gratis, garansi cuci ulang.",
-          region.slug + '/' + district.slug
-        );
+        const title = "Laundry Kiloan " + district.name + " – Bersih & Wangi | Laundry Listing " + region.name;
+        const desc = "Laundry kiloan di " + district.name + ", " + region.name + ". Mulai " + PRICING.defaultPricePerKg + "/kg, express 6 jam, antar jemput gratis, garansi cuci ulang.";
+        updateSEO(title, desc, region.slug + '/' + district.slug, phone);
         app.innerHTML = renderKecamatanPage(phone, region, district, desaList);
         initFAQ();
         return;
@@ -1116,37 +1157,35 @@
       if (!desaName || params.length !== 3) { render404(); return; }
 
       const allDesa = WILAYAH.villagesByDistrict.get(district.id) || [];
-      updateSEO(
-        "Laundry Kiloan " + desaName + ", " + district.name + " – Laundry Listing " + region.name,
-        "Laundry kiloan di " + desaName + ", Kecamatan " + district.name + ", " + region.name + ". Mulai " + PRICING.defaultPricePerKg + "/kg, antar jemput gratis ke alamat Anda.",
-        region.slug + '/' + district.slug + '/' + slugify(desaName)
-      );
+      const title = "Laundry Kiloan " + desaName + ", " + district.name + " – Laundry Listing " + region.name;
+      const desc = "Laundry kiloan di " + desaName + ", Kecamatan " + district.name + ", " + region.name + ". Mulai " + PRICING.defaultPricePerKg + "/kg, antar jemput gratis ke alamat Anda.";
+      updateSEO(title, desc, region.slug + '/' + district.slug + '/' + slugify(desaName), phone);
       app.innerHTML = renderDesaPage(phone, region, district, desaName, allDesa);
       initFAQ();
     }
 
     // ================== UPDATE STATIC UI ==================
     function updateStaticUI() {
-      const jakartaPhone = getActivePhone('jakarta-selatan');
+      const jakartaPhone = getActivePhone('jakarta-selatan') || MPCONFIG.defaultPhone;
       const lainnyaPhone = MPCONFIG.defaultPhone;
 
       const headerWa = document.getElementById('header-wa-btn');
-      if (headerWa) headerWa.setAttribute('href', buildWaHref(lainnyaPhone, 'Halo Laundry Listing, saya mau order'));
+      if (headerWa && lainnyaPhone) headerWa.setAttribute('href', buildWaHref(lainnyaPhone, 'Halo Laundry Listing, saya mau order'));
 
       const waFloat = document.getElementById('wa-float-btn');
-      if (waFloat) waFloat.setAttribute('href', buildWaHref(lainnyaPhone, 'Halo Laundry Listing, saya mau order'));
+      if (waFloat && lainnyaPhone) waFloat.setAttribute('href', buildWaHref(lainnyaPhone, 'Halo Laundry Listing, saya mau order'));
 
       document.querySelectorAll('.footer-wa-link').forEach(function (el) {
-        el.setAttribute('href', buildWaHref(lainnyaPhone, 'Halo Laundry Listing, saya mau tanya layanan'));
+        if (lainnyaPhone) el.setAttribute('href', buildWaHref(lainnyaPhone, 'Halo Laundry Listing, saya mau tanya layanan'));
       });
 
       const jakartaLink = document.getElementById('footer-phone-jakarta');
-      if (jakartaLink) {
+      if (jakartaLink && jakartaPhone) {
         jakartaLink.setAttribute('href', 'tel:+' + (jakartaPhone.startsWith('0') ? '62' + jakartaPhone.slice(1) : jakartaPhone));
         jakartaLink.innerText = jakartaPhone;
       }
       const lainnyaLink = document.getElementById('footer-phone-lainnya');
-      if (lainnyaLink) {
+      if (lainnyaLink && lainnyaPhone) {
         lainnyaLink.setAttribute('href', 'tel:+' + (lainnyaPhone.startsWith('0') ? '62' + lainnyaPhone.slice(1) : lainnyaPhone));
         lainnyaLink.innerText = lainnyaPhone;
       }
@@ -1158,21 +1197,25 @@
         showLoading('Memuat konfigurasi nomor telepon…');
         await loadMpConfig();
 
+        if (!MPCONFIG.defaultPhone) {
+          throw new Error('Nomor telepon default tidak ditemukan');
+        }
+
         showLoading('Memuat data kecamatan wilayah terpilih…');
         await loadDistricts();
 
-        // Preload villages untuk home page preview
         await loadVillages();
 
         updateStaticUI();
         await renderRoute();
       } catch (err) {
-        console.error('Gagal memuat data wilayah:', err);
+        console.error('Gagal memuat data:', err);
         const app = document.getElementById('app');
         if (app) {
           app.innerHTML = '<div class="container section" style="text-align:center; padding: 100px 24px;">' +
-            '<h2>Gagal Memuat Data Wilayah</h2>' +
-            '<p style="margin:16px 0; color:var(--gray);">Terjadi kendala saat mengambil data konfigurasi atau CSV wilayah. Silakan muat ulang halaman.</p>' +
+            '<h2>Gagal Memuat Data</h2>' +
+            '<p style="margin:16px 0; color:var(--gray);">' + err.message + '</p>' +
+            '<p style="margin:8px 0; color:var(--gray); font-size:.9rem;">Pastikan file dataPhone.js dapat diakses.</p>' +
             '</div>';
         }
       }
