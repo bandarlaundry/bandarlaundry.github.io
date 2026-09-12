@@ -1,0 +1,25 @@
+// 404.html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Redirecting...</title>
+<script>
+// GitHub Pages SPA Single-Page Apps redirect script
+// Menangkap path & query string, lalu me-redirect ke index.html
+(function() {
+// Jika menggunakan repository subfolder (contoh: username.github.io/nama-repo),
+// ubah pathSegmentsToKeep menjadi 1. Jika menggunakan Custom Domain / root, biarkan 0.
+var pathSegmentsToKeep = 0;
+var l = window.location;
+var redirectPath = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/') + l.search + l.hash;
+sessionStorage.setItem('redirect_path', redirectPath);
+var rootPath = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+'/' + l.pathname.split('/').slice(1, 1 + pathSegmentsToKeep).join('/');
+l.replace(rootPath);
+})();
+</script>
+</head>
+<body>
+</body>
+</html>
